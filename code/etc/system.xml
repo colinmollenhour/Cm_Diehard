@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Template hints
+ *
+ * @author Fabrizio Branca <fabrizio.branca@aoemedia.de>
+ * @author André Herrn <info@andre-herrn.de> (Thanks, for making border colors configurable)
+ */
+-->
+<config>
+	<sections>
+		<system>
+			<groups>
+				<aoe_static>
+					<label>Varnish Configuration (Aoe_Static)</label>
+					<frontend_type>text</frontend_type>
+					<sort_order>200</sort_order>
+					<show_in_default>1</show_in_default>
+					<show_in_website>1</show_in_website>
+					<show_in_store>1</show_in_store>
+					<fields>
+						<cache_actions translate="label">
+							<label>Cacheable actions</label>
+							<comment><![CDATA[Commaseparated list of <b>"&lt;route&gt;_&lt;controller&gt;_&lt;action&gt;;&lt;lifeTimeInSeconds&gt;" </b> The output generated from these actions will be cached by Varnish.]]></comment>
+							<frontend_type>textarea</frontend_type>
+							<sort_order>100</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</cache_actions>
+					</fields>
+				</aoe_static>
+			</groups>
+		</system>
+	</sections>
+</config>

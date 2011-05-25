@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<modules>
+		<Aoe_Static>
+			<active>true</active>
+			<codePool>local</codePool>
+		</Aoe_Static>
+	</modules>
+</config>

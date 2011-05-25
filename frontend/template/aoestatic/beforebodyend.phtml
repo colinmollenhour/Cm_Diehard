@@ -1,0 +1,11 @@
+<?php $view = $this; /* @var $view Aoe_Static_Block_Beforebodyend */?>
+<script type="text/javascript">
+//<![CDATA[
+    var AJAXHOME_URL = '<?php echo Mage::getUrl('phone/call/index') ?>';
+    var FULLACTIONNAME = '<?php echo $view->getFullActionName() ?>';
+    <?php if (($_product = Mage::registry('product')) == true) : ?>
+    var CURRENTPRODUCTID = '<?php echo $_product->getId() ?>';
+    <?php endif; ?>
+//]]>
+</script>
+<?php $view->sendHeaders(); ?>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+
+	<modules>
+		<Aoe_Static>
+			<active>true</active>
+			<codePool>local</codePool>
+			<version>0.0.1</version>
+		</Aoe_Static>
+	</modules>
+
+	<global>
+		<blocks>
+			<aoestatic>
+				<class>Aoe_Static_Block</class>
+			</aoestatic>
+		</blocks>
+	</global>
+
+	<frontend>
+		<layout>
+			<updates>
+				<aoestatic>
+					<file>aoestatic/aoestatic.xml</file>
+				</aoestatic>
+			</updates>
+		</layout>
+
+		<routers>
+			<aoestatic>
+				<use>standard</use>
+				<args>
+					<module>Aoe_Static</module>
+					<frontName>phone</frontName>
+				</args>
+			</aoestatic>
+		</routers>
+
+	</frontend>
+
+	<default>
+		<system>
+			<aoe_static>
+				<cache_actions><![CDATA[cms_index_index;86400,
+cms_page_view;86400,
+catalog_product_view;86400,
+catalog_category_view;86400]]></cache_actions>
+			</aoe_static>
+		</system>
+	</default>
+
+</config>

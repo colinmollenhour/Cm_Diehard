@@ -1,0 +1,5 @@
+code/							htdocs/app/code/local/Aoe/Static/
+js/aoestatic/					htdocs/js/aoestatic/
+frontend/layout/aoestatic/		htdocs/app/design/frontend/base/default/layout/aoestatic/
+frontend/template/aoestatic/	htdocs/app/design/frontend/base/default/template/aoestatic/
+Aoe_Static.xml					htdocs/app/etc/modules/Aoe_Static.xml
