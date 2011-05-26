@@ -35,9 +35,9 @@ class Aoe_Static_Model_Observer
         }
         
         $response->setHeader('X-Magento-Lifetime', $lifetime, true); // Only for debugging and information
-		$response->setHeader('X-Magento-Action', $fullActionName, true); // Only for debugging and information
+        $response->setHeader('X-Magento-Action', $fullActionName, true); // Only for debugging and information
         $response->setHeader('Cache-Control', 'max-age='. $lifetime, true);
-    	$response->setHeader('aoestatic', 'cache', true);
+        $response->setHeader('aoestatic', 'cache', true);
 		
         return $this;
     }
