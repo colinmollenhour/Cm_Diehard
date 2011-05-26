@@ -15,6 +15,16 @@
 				<class>Aoe_Static_Block</class>
 			</aoestatic>
 		</blocks>
+        <models>
+            <aoestatic>
+                <class>Aoe_Static_Model</class>
+            </aoestatic>
+        </models>
+        <helpers>
+            <aoestatic>
+                <class>Aoe_Static_Helper</class>
+            </aoestatic>
+        </helpers>
 	</global>
 
 	<frontend>
@@ -25,7 +35,6 @@
 				</aoestatic>
 			</updates>
 		</layout>
-
 		<routers>
 			<aoestatic>
 				<use>standard</use>
@@ -34,8 +43,17 @@
 					<frontName>phone</frontName>
 				</args>
 			</aoestatic>
-		</routers>
-
+		</routers>        
+        <events>
+            <controller_action_predispatch>
+                <observers>
+                    <aoestatic>
+                        <class>aoestatic/observer</class>
+                        <method>processPreDispatch</method>
+                    </aoestatic>
+                </observers>
+            </controller_action_predispatch>
+        </events>
 	</frontend>
 
 	<default>
@@ -47,6 +65,11 @@ catalog_product_view;86400,
 catalog_category_view;86400]]></cache_actions>
 			</aoe_static>
 		</system>
+        <dev>
+            <template>
+                <allow_symlink>1</allow_symlink>
+            </template>
+        </dev>
 	</default>
 
 </config>
