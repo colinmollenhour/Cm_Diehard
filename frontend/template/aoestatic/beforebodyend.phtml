@@ -1,7 +1,7 @@
 <?php /* @var $this Aoe_Static_Block_Beforebodyend */?>
 <script type="text/javascript">
 //<![CDATA[
-    var AJAXHOME_URL = '<?php echo Mage::getUrl('phone/call/index') ?>';
+    var AJAXHOME_URL = '<?php echo Mage::getUrl('phone/call/index', Mage::app()->getStore()->isCurrentlySecure() ? array('_secure' => 1) : array()) ?>'; 
     var FULLACTIONNAME = '<?php echo $this->getAction()->getFullActionName() ?>';
     <?php if (($_product = Mage::registry('product')) == true) : ?>
     var CURRENTPRODUCTID = '<?php echo $_product->getId() ?>';
