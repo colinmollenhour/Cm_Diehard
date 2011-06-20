@@ -12,6 +12,22 @@ sub vcl_recv {
 #		return (pipe);
 #	}
 
+	# see http://www.varnish-cache.org/trac/wiki/VCLExampleNormalizeAcceptEncoding
+	### parse accept encoding rulesets to normalize
+	if (req.http.Accept-Encoding) {
+		if (req.url ~ "\.(jpg|jpeg|png|gif|gz|tgz|bz2|tbz|mp3|ogg|swf|mp4|flv)$") {
+			# don't try to compress already compressed files
+			remove req.http.Accept-Encoding;
+		} elsif (req.http.Accept-Encoding ~ "gzip") {
+			set req.http.Accept-Encoding = "gzip";
+		} elsif (req.http.Accept-Encoding ~ "deflate") {
+			set req.http.Accept-Encoding = "deflate";
+		} else {
+			# unkown algorithm
+			remove req.http.Accept-Encoding;
+		}
+	}
+
 	if (req.http.x-forwarded-for) {
 		set req.http.X-Forwarded-For =
 		req.http.X-Forwarded-For ", " client.ip;
