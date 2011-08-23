@@ -9,6 +9,34 @@
  */
 class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
 {
+
+    /**
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        static $enabled = NULL;
+        if($enabled === NULL) {
+          $enabled = $this->isModuleOutputEnabled();
+        }
+        return $enabled;
+    }
+
+    /**
+     * Returns true if the current request will be cached
+     *
+     * @param null|bool $flag
+     * @return bool
+     */
+    public function isForCache($flag = NULL)
+    {
+        static $cached = FALSE;
+        if($flag !== NULL) {
+            $cached = $flag;
+        }
+        return $cached;
+    }
+
     /**
      * Check if a fullActionName is configured as cacheable
      *
@@ -26,4 +54,13 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return false;
 	}
+
+    /**
+     * @return string|NULL
+     */
+    public function getJslib()
+    {
+        return Mage::getStoreConfig('system/aoe_static/jslib');
+    }
+
 }

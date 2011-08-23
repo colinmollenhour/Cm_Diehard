@@ -23,14 +23,25 @@ class Aoe_Static_CallController extends Mage_Core_Controller_Front_Action {
 		$response = array();
 		$response['sid'] = Mage::getModel('core/session')->getEncryptedSessionId();
 
-		if ($currentProductId = $this->getRequest()->getParam('currentProductId')) {
+		// Translate JSON to params if using Prototype
+		if($params = $this->getRequest()->getParam('json')) {
+          $params = json_decode($params, TRUE);
+          $this->getRequest()->setParams($params);
+        }
+
+		if ($currentProductId = $this->getRequest()->getParam('product_id')) {
 			Mage::getSingleton('catalog/session')->setLastViewedProductId($currentProductId);
 		}
 
-		$this->loadLayout();
+		$handles = array(
+			'default',
+			'AOESTATIC_default',
+			'AOESTATIC_'.$this->getRequest()->getParam('action')
+		);
+		$this->loadLayout($handles);
 		$layout = $this->getLayout();
 
-		$requestedBlockNames = $this->getRequest()->getParam('getBlocks');
+		$requestedBlockNames = $this->getRequest()->getParam('blocks', array());
 		foreach ($requestedBlockNames as $id => $requestedBlockName) {
 			$tmpBlock = $layout->getBlock($requestedBlockName);
 			if ($tmpBlock) {

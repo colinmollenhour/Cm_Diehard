@@ -4,7 +4,7 @@
  * Template hints
  *
  * @author Fabrizio Branca <fabrizio.branca@aoemedia.de>
- * @author André Herrn <info@andre-herrn.de> (Thanks, for making border colors configurable)
+ * @author Colin Mollenhour
  */
 -->
 <config>
@@ -12,7 +12,7 @@
 		<system>
 			<groups>
 				<aoe_static>
-					<label>Varnish Configuration (Aoe_Static)</label>
+					<label>Full-Page Cache Configuration (Aoe_Static)</label>
 					<frontend_type>text</frontend_type>
 					<sort_order>200</sort_order>
 					<show_in_default>1</show_in_default>
@@ -28,6 +28,16 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</cache_actions>
+						<jslib translate="label">
+							<label>Javascript Library</label>
+							<comment><![CDATA[Load non-cacheable blocks via Ajax using this library (must already be included).]]></comment>
+							<frontend_type>select</frontend_type>
+							<source_model>aoestatic/system_config_jslib</source_model>
+							<sort_order>110</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</jslib>
 					</fields>
 				</aoe_static>
 			</groups>

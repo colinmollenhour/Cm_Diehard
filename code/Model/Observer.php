@@ -12,12 +12,18 @@ class Aoe_Static_Model_Observer
      * Check when varnish caching should be enabled.
      *
      * @param Varien_Event_Observer $observer
-     * @return Aoe_Static_Model_Observer
+     * @return void
      */
     public function processPreDispatch(Varien_Event_Observer $observer)
     {
         /* @var $helper Aoe_Static_Helper_Data */
         $helper = Mage::helper('aoestatic');
+
+        if($helper->isEnabled()) {
+          Mage::register('aoestatic', $helper);
+        } else {
+          return;
+        }
         
         $controllerAction = $observer->getEvent()->getControllerAction();
         
@@ -31,14 +37,15 @@ class Aoe_Static_Model_Observer
         $lifetime = $helper->isCacheableAction($fullActionName);
         
         if (!$lifetime) {
-            return $this;
+            return;
         }
-        
+
+        $helper->isForCache(TRUE);
         $response->setHeader('X-Magento-Lifetime', $lifetime, true); // Only for debugging and information
         $response->setHeader('X-Magento-Action', $fullActionName, true); // Only for debugging and information
         $response->setHeader('Cache-Control', 'max-age='. $lifetime, true);
         $response->setHeader('aoestatic', 'cache', true);
 		
-        return $this;
+        return;
     }
 }

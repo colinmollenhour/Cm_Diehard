@@ -1,0 +1,12 @@
+<?php /* @var $this Aoe_Static_Block_Afterbodystart */ ?>
+<?php if( ! Mage::registry('aoestatic')) return; ?>
+<script type="text/javascript">
+    var aoeStaticUrl = '<?php echo $this->getPhoneUrl() ?>';
+    var aoeStatic = {
+        action: '<?php echo $this->getAction()->getFullActionName() ?>',
+        blocks: {}
+    };
+<?php if ($_product = Mage::registry('product')) : ?>
+    aoeStatic.product_id = <?php echo (int) $_product->getId() ?>;
+<?php endif; ?>
+</script>

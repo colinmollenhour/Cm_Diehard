@@ -1,14 +1,12 @@
 <layout version="0.1.0">
 	<default>
 
-		<reference name="head">
-			<action method="addJs"><script>aoestatic/jquery-1.6.1.min.js</script></action>
-			<action method="addJs"><script>aoestatic/jquery.cookie.js</script></action>
-			<action method="addJs"><script>aoestatic/common.js</script></action>
+		<reference name="after_body_start">
+			<block type="aoestatic/afterbodystart" name="aoestatic_start" template="aoestatic/afterbodystart.phtml" />
 		</reference>
 
 		<reference name="before_body_end">
-			<block type="aoestatic/beforebodyend" template="aoestatic/beforebodyend.phtml"></block>
+			<block type="aoestatic/beforebodyend" name="aoestatic_end" template="aoestatic/beforebodyend.phtml"></block>
 		</reference>
 
 	</default>
