@@ -25,6 +25,15 @@
                 <class>Aoe_Static_Helper</class>
             </aoestatic>
         </helpers>
+        <cache>
+            <types>
+                <aoestatic translate="label,description" module="aoestatic">
+                    <label>Full Page Cache</label>
+                    <description>Full Page Cache provided by Aoe_Static</description>
+                    <tags>AOESTATIC,AOESTATIC_URLS</tags>
+                </aoestatic>
+            </types>
+        </cache>
 	</global>
 
 	<frontend>
@@ -48,14 +57,51 @@
             <controller_action_predispatch>
                 <observers>
                     <aoestatic>
+                        <type>singleton</type>
                         <class>aoestatic/observer</class>
                         <method>processPreDispatch</method>
                     </aoestatic>
                 </observers>
             </controller_action_predispatch>
+            <http_response_send_before>
+                <observers>
+                    <aoestatic>
+                        <type>singleton</type>
+                        <class>aoestatic/observer</class>
+                        <method>httpResponseSendBefore</method>
+                    </aoestatic>
+                </observers>
+            </http_response_send_before>
+            <application_clean_cache>
+                <observers>
+                    <aoestatic>
+                        <type>singleton</type>
+                        <class>aoestatic/observer</class>
+                        <method>applicationCleanCache</method>
+                    </aoestatic>
+                </observers>
+            </application_clean_cache>
+            <model_load_after>
+                <observers>
+                    <aoestatic>
+                        <type>singleton</type>
+                        <class>aoestatic/observer</class>
+                        <method>modelLoadAfter</method>
+                    </aoestatic>
+                </observers>
+            </model_load_after>
         </events>
 	</frontend>
 
+    <aoestatic>
+        <backends>
+            <magento>
+                <label>Magento Cache</label>
+                <model>aoestatic/backend_magento</model>
+            </magento>
+        </backends>
+    </aoestatic>
+    
 	<default>
 		<system>
 			<aoe_static>
@@ -64,6 +110,7 @@ cms_page_view;86400,
 catalog_product_view;86400,
 catalog_category_view;86400]]></cache_actions>
 				<jslib>prototype</jslib>
+                <cache_control>public, must-revalidate, s-maxage=%d</cache_control>
 			</aoe_static>
 		</system>
         <dev>

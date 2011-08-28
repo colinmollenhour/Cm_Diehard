@@ -29,6 +29,7 @@ class Aoe_Static_CallController extends Mage_Core_Controller_Front_Action {
           $this->getRequest()->setParams($params);
         }
 
+        // TODO - implement as event observer
 		if ($currentProductId = $this->getRequest()->getParam('product_id')) {
 			Mage::getSingleton('catalog/session')->setLastViewedProductId($currentProductId);
 		}
@@ -36,7 +37,7 @@ class Aoe_Static_CallController extends Mage_Core_Controller_Front_Action {
 		$handles = array(
 			'default',
 			'AOESTATIC_default',
-			'AOESTATIC_'.$this->getRequest()->getParam('action')
+			'AOESTATIC_'.$this->getRequest()->getParam('full_action_name')
 		);
 		$this->loadLayout($handles);
 		$layout = $this->getLayout();

@@ -38,6 +38,26 @@
 							<show_in_website>1</show_in_website>
 							<show_in_store>1</show_in_store>
 						</jslib>
+						<backend translate="label">
+							<label>Cache Backend</label>
+							<comment><![CDATA[Choose a backend driver for the cache (handles caching response and purging cache).]]></comment>
+							<frontend_type>select</frontend_type>
+							<source_model>aoestatic/system_config_backend</source_model>
+							<sort_order>120</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</backend>
+						<cachecontrol translate="label">
+							<label>Cache-Control Header</label>
+							<comment><![CDATA[Choose how the content can be cached.]]></comment>
+							<frontend_type>select</frontend_type>
+							<source_model>aoestatic/system_config_cachecontrol</source_model>
+							<sort_order>130</sort_order>
+							<show_in_default>1</show_in_default>
+							<show_in_website>1</show_in_website>
+							<show_in_store>1</show_in_store>
+						</cachecontrol>
 					</fields>
 				</aoe_static>
 			</groups>

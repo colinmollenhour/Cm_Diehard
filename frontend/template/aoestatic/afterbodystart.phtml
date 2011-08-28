@@ -1,12 +1,13 @@
 <?php /* @var $this Aoe_Static_Block_Afterbodystart */ ?>
-<?php if( ! Mage::registry('aoestatic')) return; ?>
+<?php if(Mage::registry('aoestatic') && Mage::registry('aoestatic')->useAjax()): ?>
 <script type="text/javascript">
     var aoeStaticUrl = '<?php echo $this->getPhoneUrl() ?>';
     var aoeStatic = {
-        action: '<?php echo $this->getAction()->getFullActionName() ?>',
+        full_action_name: '<?php echo $this->getAction()->getFullActionName() ?>',
         blocks: {}
     };
-<?php if ($_product = Mage::registry('product')) : ?>
+    <?php if ($_product = Mage::registry('product')) : ?>
     aoeStatic.product_id = <?php echo (int) $_product->getId() ?>;
-<?php endif; ?>
+    <?php endif; ?>
 </script>
+<?php endif; ?>
