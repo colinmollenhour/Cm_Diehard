@@ -46,16 +46,28 @@ class Aoe_Static_Model_Observer
         if($this->helper()->isEnabled()) {
             $fullActionName = $observer->getControllerAction()->getFullActionName();
             $lifetime = $this->helper()->getLifetime();
-
-            /* @var $response Mage_Core_Controller_Response_Http */
-            $response = $observer->getControllerAction()->getResponse();
+            $response = $observer->getControllerAction()->getResponse(); /* @var $response Mage_Core_Controller_Response_Http */
 
             if($lifetime) {
+                // Allow backend to take action on responses that are to be cached
                 $this->helper()->getBackend()->httpResponseSendBefore($response, $lifetime);
             }
+
+            // Update static_ignored cookie
+            $cookies = Mage::getSingleton('core/cookie'); /* @var $cookies Mage_Core_Model_Cookie */
+            $ignored = explode(',',$cookies->get('static_ignored'));
+            $addedIgnored = $this->helper()->getAddedIgnoredBlocks();
+            $removedIgnored = $this->helper()->getRemovedIgnoredBlocks();
+            $ignored = array_unique(array_merge($ignored, $addedIgnored));
+            $ignored = array_diff($ignored, $removedIgnored);
+            $cookies->set('static_ignored', implode(',',$ignored));
+
+            // Add debug data
             if($this->helper()->isDebug()) {
                 $response->setHeader('X-FullPageCache', "$fullActionName-$lifetime", true);
                 $response->setHeader('X-FullPageCache-Tags', implode('|', $this->helper()->getTags()), true);
+                $response->setHeader('X-FullPageCache-AddedIgnoredBlocks', implode('|',$addedIgnored), true);
+                $response->setHeader('X-FullPageCache-RemovedIgnoredBlocks', implode('|',$removedIgnored), true);
             }
         }
     }

@@ -27,13 +27,22 @@
             $$('.placeholder').each(function(el) {
               aoeStatic.blocks[el.id] = el.readAttribute('rel');
             });
-            new Ajax.Request(aoeStaticUrl, {
-                parameters: {json: Object.toJSON(aoeStatic)},
-                evalJSON: 'force',
-                onSuccess: function(response) {
-                    aoeStaticReplace(response.responseJSON);
+            var ignored = Mage.Cookie.get('static_ignored').split(',');
+            aoeStatic.blocks = $H(aoeStatic.blocks).inject({}, function(acc, pair){
+                if( ! ignored.member(pair.value)) {
+                    acc[pair.key] = pair.value;
                 }
+                return acc;
             });
+            if($H(aoeStatic.blocks).keys().length) {
+                new Ajax.Request(aoeStaticUrl, {
+                    parameters: {json: Object.toJSON(aoeStatic)},
+                    evalJSON: 'force',
+                    onSuccess: function(response) {
+                        aoeStaticReplace(response.responseJSON);
+                    }
+                });
+            }
         });
         <?php elseif('jquery' == $helper->getJslib()): ?>
         jQuery(document).ready(function($) {

@@ -20,20 +20,18 @@ class Aoe_Static_CallController extends Mage_Core_Controller_Front_Action {
 
 		// if (!$this->getRequest()->isXmlHttpRequest()) { Mage::throwException('This is not an XmlHttpRequest'); }
 
-		$response = array();
-		$response['sid'] = Mage::getModel('core/session')->getEncryptedSessionId();
+		$response = array(
+			'blocks' => array(),
+			'ignoreBlocks' => array(),
+		);
 
 		// Translate JSON to params if using Prototype
 		if($params = $this->getRequest()->getParam('json')) {
-          $params = json_decode($params, TRUE);
-          $this->getRequest()->setParams($params);
-        }
-
-        // TODO - implement as event observer
-		if ($currentProductId = $this->getRequest()->getParam('product_id')) {
-			Mage::getSingleton('catalog/session')->setLastViewedProductId($currentProductId);
+		  $params = json_decode($params, TRUE);
+		  $this->getRequest()->setParams($params);
 		}
 
+		// Add handles to layout
 		$handles = array(
 			'default',
 			'AOESTATIC_default',
@@ -42,6 +40,7 @@ class Aoe_Static_CallController extends Mage_Core_Controller_Front_Action {
 		$this->loadLayout($handles);
 		$layout = $this->getLayout();
 
+		// Render block content
 		$requestedBlockNames = $this->getRequest()->getParam('blocks', array());
 		foreach ($requestedBlockNames as $id => $requestedBlockName) {
 			$tmpBlock = $layout->getBlock($requestedBlockName);
@@ -51,6 +50,8 @@ class Aoe_Static_CallController extends Mage_Core_Controller_Front_Action {
 				$response['blocks'][$id] = 'BLOCK NOT FOUND';
 			}
 		}
+
+		// Send JSON response
 		$this->getResponse()->setBody(Zend_Json::encode($response));
 	}
 

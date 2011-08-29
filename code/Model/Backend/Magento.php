@@ -1,5 +1,22 @@
 <?php
-
+/**
+ * This cache backend uses Magento's main cache storage for full page cache.
+ *
+ * Pros:
+ *   - Drop-in and go, no additional requirements
+ *   - Offers additional flexibility when determining if cached response should be used
+ *   - Cache clearing and invalidation is handled instantly and automatically
+ *   - Experimental: can do dynamic replacement without using Ajax
+ * Cons:
+ *   - Magento is still loaded (but, controller is only dispatched when necessary)
+ *   - Will probably increase size of Magento's cache considerably
+ *
+ * TODO: extend this with a version which uses a separate cache backend so primary cache is not affected
+ *
+ * @category    Aoe
+ * @package     Aoe_Static
+ * @author      Colin Mollenhour
+ */
 class Aoe_Static_Model_Backend_Magento extends Aoe_Static_Model_Backend_Abstract
 {
 
@@ -45,7 +62,7 @@ class Aoe_Static_Model_Backend_Magento extends Aoe_Static_Model_Backend_Abstract
             Mage::app()->saveCache($response->getBody(), $cacheKey, $tags, $lifetime);
         }
 
-        // Inject dynamic content replacement at end of body to save an Ajax request
+        // Experimental: Inject dynamic content replacement at end of body to save an Ajax request
         if( ! $this->useAjax()) {
             $body = $response->getBody('default');
             $body = str_replace('</body>', $this->getDynamicBlockReplacement().'</body>', $body, 1);
@@ -71,8 +88,7 @@ class Aoe_Static_Model_Backend_Magento extends Aoe_Static_Model_Backend_Abstract
      */
     public function extractContent($content)
     {
-        $helper = Mage::helper('aoestatic');
-        if( ! $helper->isEnabled()) {
+        if( ! $this->helper()->isEnabled()) {
             return FALSE;
         }
 
@@ -86,37 +102,49 @@ class Aoe_Static_Model_Backend_Magento extends Aoe_Static_Model_Backend_Abstract
             ));
 
             if($this->getUseCachedResponse()) {
-                return Mage::app()->load($cacheKey);
+                return Mage::app()->loadCache($cacheKey);
             }
         }
         return FALSE;
     }
 
+    /**
+     * Incomplete and untested.
+     *
+     * @return string
+     */
     public function getDynamicBlockReplacement()
     {
-        if( ! Mage::app()->getFrontController()->getAction()) {
-            $scopeCode = ''; // TODO
-            $scopeType = 'store'; // TODO
+        // Append dynamic block content to end of page to be replaced by javascript, but not Ajax
+        if($dynamicBlocks = $this->helper()->getObservedBlocks()) {
+            // Init store if it has not been inited yet (page served from cache)
+            if( ! Mage::app()->getFrontController()->getAction()) {
+                $scopeCode = ''; // TODO
+                $scopeType = 'store'; // TODO
 
-            Mage::app()->init($scopeCode, $scopeType);
+                Mage::app()->init($scopeCode, $scopeType);
+            }
+
+            // Create a subrequest
+            $request = new Mage_Core_Controller_Request_Http('phone/call/index');
+            $request->setModuleName('phone');
+            $request->setControllerName('call');
+            $request->setActionName('index');
+            $request->setControllerModule('Aoe_Static');
+            // TODO $request->setParam('full_action_name', ???);
+            $request->setParam('blocks', $dynamicBlocks);
+            $response = new Mage_Core_Controller_Response_Http;
+            $controller = new Aoe_Static_CallController($request, $response);
+            $controller->preDispatch();
+            $controller->dispatch('index');
+
+            return "<script type=\"text/javascript\">aoeStaticReplace({$response->getBody()});</script>";
         }
 
-        // Create a subrequest
-        $request = new Mage_Core_Controller_Request_Http('aoestatic/call/index');
-        $request->setModuleName('aoestatic');
-        $request->setControllerName('call');
-        $request->setActionName('index');
-        $request->setControllerModule('Aoe_Static');
-        // TODO $request->setParam('full_action_name', ???);
-        $request->setParam('blocks', $this->getDynamicBlocks());
-        if(Mage::registry('product')) {
-            $request->setParam('product_id', Mage::registry('product')->getId());
+        // No dynamic blocks at this time
+        else {
+            return '';
         }
-        $response = new Mage_Core_Controller_Response_Http;
-        $controller = new Aoe_Static_CallController($request, $response);
-        $controller->preDispatch();
-        $controller->dispatch('index');
-
-        return "<script type=\"text/javascript\">aoeStaticReplace({$response->getBody()});</script>";
     }
+
 }

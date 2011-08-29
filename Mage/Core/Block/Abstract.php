@@ -1191,7 +1191,7 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
                 $htmlId = 'db_'.preg_replace('/[^a-zA-Z0-9]+/', '_', $this->getNameInLayout());
                 $this->setFrameTags('div id="'.$htmlId."'", 'div');
             }
-            Mage::helper('aoestatic')->addBlock($htmlId, $this->getNameInLayout());
+            Mage::helper('aoestatic')->addDynamicBlock($htmlId, $this->getNameInLayout());
         }
         return parent::setData('block_is_dynamic', TRUE);
     }

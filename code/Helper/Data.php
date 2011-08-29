@@ -19,6 +19,10 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
 
     protected $_blocks = array();
 
+    protected $_addedIgnoredBlocks = array();
+
+    protected $_removedIgnoredBlocks = array();
+
     /**
      * @return bool
      */
@@ -81,7 +85,7 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
      * @param string $nameInLayout
      * @return void
      */
-    public function addBlock($htmlId, $nameInLayout)
+    public function addDynamicBlock($htmlId, $nameInLayout)
     {
         $this->_blocks[$htmlId] = $nameInLayout;
     }
@@ -89,9 +93,57 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @return array
      */
-    public function getBlocks()
+    public function getDynamicBlocks()
     {
         return $this->_blocks;
+    }
+
+    /**
+     * @param string $block
+     * @return void
+     */
+    public function addIgnoredBlock($block)
+    {
+        if($block instanceof Mage_Core_Block_Abstract) {
+            $block = $block->getNameInLayout();
+        }
+        $this->_addedIgnoredBlocks[] = $block;
+    }
+
+    /**
+     * @param string $block
+     * @return void
+     */
+    public function removeIgnoredBlock($block)
+    {
+        if($block instanceof Mage_Core_Block_Abstract) {
+            $block = $block->getNameInLayout();
+        }
+        $this->_removeIgnoredBlocks[] = $block;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAddedIgnoredBlocks()
+    {
+        return $this->_addedIgnoredBlocks;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRemovedIgnoredBlocks()
+    {
+        return $this->_removedIgnoredBlocks;
+    }
+
+    /**
+     * @return array
+     */
+    public function getObservedBlocks()
+    {
+        return array_diff($this->_addedIgnoredBlocks, $this->_removedIgnoredBlocks);
     }
 
     /**

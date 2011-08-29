@@ -31,6 +31,7 @@ abstract class Aoe_Static_Model_Backend_Abstract
     {
         return implode('_',array(
             'AOESTATIC',
+            Mage::app()->getStore()->getId(),
             Mage::app()->getRequest()->getScheme(),
             Mage::app()->getRequest()->getHttpHost(FALSE),
             Mage::app()->getRequest()->getRequestUri(),
