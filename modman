@@ -1,4 +1,4 @@
-code/							app/code/local/Aoe/Static/
-frontend/layout/aoestatic/		app/design/frontend/base/default/layout/aoestatic/
-frontend/template/aoestatic/	app/design/frontend/base/default/template/aoestatic/
-Aoe_Static.xml					app/etc/modules/Aoe_Static.xml
+code/                             app/code/local/Aoe/Static/
+frontend/layout/aoestatic/        app/design/frontend/base/default/layout/aoestatic/
+frontend/template/aoestatic/      app/design/frontend/base/default/template/aoestatic/
+Aoe_Static.xml                    app/etc/modules/Aoe_Static.xml

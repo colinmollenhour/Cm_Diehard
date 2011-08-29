@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
 
-	<modules>
-		<Aoe_Static>
-			<active>true</active>
-			<codePool>local</codePool>
-			<version>0.0.1</version>
-		</Aoe_Static>
-	</modules>
+    <modules>
+        <Aoe_Static>
+            <active>true</active>
+            <codePool>local</codePool>
+            <version>0.0.1</version>
+        </Aoe_Static>
+    </modules>
 
-	<global>
-		<blocks>
-			<aoestatic>
-				<class>Aoe_Static_Block</class>
-			</aoestatic>
-		</blocks>
+    <global>
+        <blocks>
+            <aoestatic>
+                <class>Aoe_Static_Block</class>
+            </aoestatic>
+        </blocks>
         <models>
             <aoestatic>
                 <class>Aoe_Static_Model</class>
@@ -34,25 +34,25 @@
                 </aoestatic>
             </types>
         </cache>
-	</global>
+    </global>
 
-	<frontend>
-		<layout>
-			<updates>
-				<aoestatic>
-					<file>aoestatic/aoestatic.xml</file>
-				</aoestatic>
-			</updates>
-		</layout>
-		<routers>
-			<aoestatic>
-				<use>standard</use>
-				<args>
-					<module>Aoe_Static</module>
-					<frontName>phone</frontName>
-				</args>
-			</aoestatic>
-		</routers>        
+    <frontend>
+        <layout>
+            <updates>
+                <aoestatic>
+                    <file>aoestatic/aoestatic.xml</file>
+                </aoestatic>
+            </updates>
+        </layout>
+        <routers>
+            <aoestatic>
+                <use>standard</use>
+                <args>
+                    <module>Aoe_Static</module>
+                    <frontName>phone</frontName>
+                </args>
+            </aoestatic>
+        </routers>
         <events>
             <controller_action_predispatch>
                 <observers>
@@ -91,7 +91,7 @@
                 </observers>
             </model_load_after>
         </events>
-	</frontend>
+    </frontend>
 
     <aoestatic>
         <backends>
@@ -102,22 +102,22 @@
         </backends>
     </aoestatic>
     
-	<default>
-		<system>
-			<aoe_static>
-				<cache_actions><![CDATA[cms_index_index;86400,
+    <default>
+        <system>
+            <aoe_static>
+                <cache_actions><![CDATA[cms_index_index;86400,
 cms_page_view;86400,
 catalog_product_view;86400,
 catalog_category_view;86400]]></cache_actions>
-				<jslib>prototype</jslib>
+                <jslib>prototype</jslib>
                 <cache_control>public, must-revalidate, s-maxage=%d</cache_control>
-			</aoe_static>
-		</system>
+            </aoe_static>
+        </system>
         <dev>
             <template>
                 <allow_symlink>1</allow_symlink>
             </template>
         </dev>
-	</default>
+    </default>
 
 </config>
