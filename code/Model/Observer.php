@@ -82,8 +82,10 @@ class Aoe_Static_Model_Observer
      */
     public function applicationCleanCache(Varien_Event_Observer $observer)
     {
-        $tags = $observer->getTags();
-        $this->helper()->getBackend()->cleanCache($tags);
+        if($this->helper()->isEnabled()) {
+            $tags = $observer->getTags();
+            $this->helper()->getBackend()->cleanCache($tags);
+        }
     }
 
     public function modelLoadAfter(Varien_Event_Observer $observer)

@@ -11,6 +11,10 @@
 class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
 {
 
+    const XML_PATH_BACKEND              = 'system/aoe_static/backend';
+    const XML_PATH_DEBUG                = 'system/aoe_static/debug';
+    const XML_PATH_JSLIB                = 'system/aoe_static/jslib';
+
     const CACHE_TAG = 'AOESTATIC';
 
     protected $_lifetime = FALSE;
@@ -30,7 +34,7 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
     {
         static $enabled = NULL;
         if($enabled === NULL) {
-            $enabled = Mage::app()->useCache('aoestatic');
+            $enabled = Mage::app()->useCache('aoestatic') && Mage::getStoreConfig(self::XML_PATH_BACKEND);
         }
         return $enabled;
     }
@@ -40,7 +44,7 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isDebug()
     {
-        return Mage::getStoreConfigFlag('system/aoe_static/debug');
+        return Mage::getStoreConfigFlag(self::XML_PATH_DEBUG);
     }
 
     /**
@@ -169,7 +173,7 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getBackendModel()
     {
-        $backend = Mage::getStoreConfig('system/aoe_static/backend');
+        $backend = Mage::getStoreConfig(self::XML_PATH_BACKEND);
         return (string) Mage::getConfig()->getNode('aoestatic/backends/'.$backend.'/model');
     }
 
@@ -178,7 +182,7 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getBackendLabel()
     {
-        $backend = Mage::getStoreConfig('system/aoe_static/backend');
+        $backend = Mage::getStoreConfig(self::XML_PATH_BACKEND);
         return (string) Mage::getConfig()->getNode('aoestatic/backends/'.$backend.'/label');
     }
 
@@ -195,7 +199,7 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getJslib()
     {
-        return Mage::getStoreConfig('system/aoe_static/jslib');
+        return Mage::getStoreConfig(self::XML_PATH_JSLIB);
     }
 
     /**
