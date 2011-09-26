@@ -158,12 +158,9 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isCacheableAction($fullActionName)
     {
-        $cacheActionsString = Mage::getStoreConfig('system/aoe_static/cache_actions');
-        foreach (explode(',', $cacheActionsString) as $singleActionConfiguration) {
-            list($actionName, $lifeTime) = explode(';', $singleActionConfiguration);
-            if (trim($actionName) == $fullActionName) {
-                return intval(trim($lifeTime));
-            }
+        $lifeTime = Mage::app()->getConfig()->getNode('aoestatic/actions/'.$fullActionName);
+        if($lifeTime) {
+            return intval($lifeTime);
         }
         return false;
     }

@@ -88,6 +88,13 @@ class Aoe_Static_Model_Observer
         }
     }
 
+    /**
+     * Observe all models so that a cached page can be associated with all model instances
+     * loaded in the course of page rendering.
+     *
+     * @param Varien_Event_Observer $observer
+     * @return void
+     */
     public function modelLoadAfter(Varien_Event_Observer $observer)
     {
         if($this->helper()->getLifetime() && ($tags = $observer->getObject()->getCacheTags())) {

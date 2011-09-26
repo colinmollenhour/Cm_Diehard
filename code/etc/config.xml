@@ -54,6 +54,8 @@
             </aoestatic>
         </routers>
         <events>
+
+            <!-- Check if cache should be enabled -->
             <controller_action_predispatch>
                 <observers>
                     <aoestatic>
@@ -63,6 +65,8 @@
                     </aoestatic>
                 </observers>
             </controller_action_predispatch>
+
+            <!-- If cache is enabled, let backend cache response -->
             <http_response_send_before>
                 <observers>
                     <aoestatic>
@@ -72,6 +76,8 @@
                     </aoestatic>
                 </observers>
             </http_response_send_before>
+
+            <!-- When cache tags are cleaned, invalidate cached pages -->
             <application_clean_cache>
                 <observers>
                     <aoestatic>
@@ -81,6 +87,8 @@
                     </aoestatic>
                 </observers>
             </application_clean_cache>
+
+            <!-- Collect all loaded cache tags to associate with page -->
             <model_load_after>
                 <observers>
                     <aoestatic>
@@ -94,6 +102,16 @@
     </frontend>
 
     <aoestatic>
+
+        <!-- Cacheable actions and their lifetimes -->
+        <actions>
+            <cms_index_index>86400</cms_index_index>
+            <cms_page_view>86400</cms_page_view>
+            <catalog_product_view>86400</catalog_product_view>
+            <catalog_category_view>86400</catalog_category_view>
+        </actions>
+
+        <!-- List of available cache backend models -->
         <backends>
             <magento>
                 <label>Magento Cache</label>
@@ -105,10 +123,6 @@
     <default>
         <system>
             <aoe_static>
-                <cache_actions><![CDATA[cms_index_index;86400,
-cms_page_view;86400,
-catalog_product_view;86400,
-catalog_category_view;86400]]></cache_actions>
                 <jslib>prototype</jslib>
                 <cache_control>public, must-revalidate, s-maxage=%d</cache_control>
             </aoe_static>
