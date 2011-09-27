@@ -138,7 +138,7 @@ class Aoe_Static_Model_Backend_Magento extends Aoe_Static_Model_Backend_Abstract
             $controller->preDispatch();
             $controller->dispatch('index');
 
-            return "<script type=\"text/javascript\">aoeStaticReplace({$response->getBody()});</script>";
+            return "<script type=\"text/javascript\">FullPageCache.replaceBlocks({$response->getBody()});</script>";
         }
 
         // No dynamic blocks at this time

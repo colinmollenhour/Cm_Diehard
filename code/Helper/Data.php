@@ -17,6 +17,9 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
 
     const CACHE_TAG = 'AOESTATIC';
 
+    /** Cookie key for list of ignored blocks */
+    const COOKIE_IGNORED_BLOCKS = 'static_ignored';
+
     protected $_lifetime = FALSE;
 
     protected $_tags = array();
@@ -142,12 +145,62 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->_removedIgnoredBlocks;
     }
 
+
     /**
-     * @return array
+     * Add list of ignored blocks from config for fresh sessions
+     *
+     * @return void
+     */
+    public function addDefaultIgnoredBlocks()
+    {
+        foreach(Mage::getConfig()->getNode('aoestatic/ignored')->asArray() as $block => $_) {
+            $this->addIgnoredBlock($block);
+        }
+    }
+
+    /**
+     * Get the ignored blocks for the current session (cookie value)
+     *
+     * @return array|null
+     */
+    public function getIgnoredBlocks()
+    {
+        $ignoredBlocks = Mage::getSingleton('core/cookie')->get(self::COOKIE_IGNORED_BLOCKS);
+        return ($ignoredBlocks === false ? NULL : explode(',', $ignoredBlocks));
+    }
+
+    /**
+     * Set the ignored blocks for the current session (cookie value)
+     *
+     * @param array $ignoredBlocks
+     * @return void
+     */
+    public function setIgnoredBlocks($ignoredBlocks)
+    {
+        $ignoredBlocks = implode(',', $ignoredBlocks);
+        Mage::getSingleton('core/cookie')->set(self::COOKIE_IGNORED_BLOCKS, $ignoredBlocks);
+    }
+
+    /**
+     * Get array of all blocks excluding the ignored blocks
+     *
+     * @return array of htmlId => nameInLayout
      */
     public function getObservedBlocks()
     {
-        return array_diff($this->_addedIgnoredBlocks, $this->_removedIgnoredBlocks);
+        $blocks = array_values($this->getDynamicBlocks());
+        $ignored = $this->getIgnoredBlocks();
+        $ignored = array_merge($ignored, $this->_addedIgnoredBlocks);
+        $ignored = array_diff($ignored, $this->_removedIgnoredBlocks);
+        $blocks = array_diff($blocks, $ignored);
+
+        $observedBlocks = array();
+        foreach($this->getDynamicBlocks() as $htmlId => $nameInLayout) {
+            if(in_array($nameInLayout, $blocks)) {
+                $observedBlocks[$htmlId] = $nameInLayout;
+            }
+        }
+        return $observedBlocks;
     }
 
     /**

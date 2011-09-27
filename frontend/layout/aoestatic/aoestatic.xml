@@ -1,10 +1,17 @@
 <layout version="0.1.0">
     <default>
 
+        <!-- Add javascript for appropriate supported library -->
+        <reference name="head">
+            <action method="addJs" ifconfig="system/aoe_static/usejs"><script helper="aeostatic/getJsLib" /></action>
+        </reference>
+
+        <!-- Initialize javascript object and dom:loaded event -->
         <reference name="after_body_start">
             <block type="aoestatic/afterbodystart" name="aoestatic_start" template="aoestatic/afterbodystart.phtml" />
         </reference>
 
+        <!-- Add all dynamic blocks before ajax request -->
         <reference name="before_body_end">
             <block type="aoestatic/beforebodyend" name="aoestatic_end" template="aoestatic/beforebodyend.phtml"></block>
         </reference>

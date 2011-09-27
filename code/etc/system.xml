@@ -19,17 +19,28 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
-                        <jslib translate="label">
-                            <label>Javascript Library</label>
-                            <comment><![CDATA[Load non-cacheable blocks via Ajax using this library (must already be included).]]></comment>
+                        <usejs translate="label comment">
+                            <label>Use Javascript Block Replacement</label>
+                            <comment><![CDATA[If not enabled, users with dynamic content will not get cached results.]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>109</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </usejs>
+                        <jslib translate="label comment">
+                            <label>Supported Javascript Library</label>
+                            <comment><![CDATA[Select which library is used for dynamic block replacement.]]></comment>
                             <frontend_type>select</frontend_type>
                             <source_model>aoestatic/system_config_jslib</source_model>
                             <sort_order>110</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
+                            <depends><usejs>1</usejs></depends>
                         </jslib>
-                        <backend translate="label">
+                        <backend translate="label comment">
                             <label>Cache Backend</label>
                             <comment><![CDATA[Choose a backend driver for the cache (handles caching response and purging cache).]]></comment>
                             <frontend_type>select</frontend_type>
@@ -39,7 +50,7 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </backend>
-                        <cachecontrol translate="label">
+                        <cachecontrol translate="label comment">
                             <label>Cache-Control Header</label>
                             <comment><![CDATA[Choose how the content can be cached.]]></comment>
                             <frontend_type>select</frontend_type>

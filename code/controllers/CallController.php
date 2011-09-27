@@ -47,7 +47,7 @@ class Aoe_Static_CallController extends Mage_Core_Controller_Front_Action {
             if ($tmpBlock) {
                 $response['blocks'][$id] = $tmpBlock->toHtml();
             } else {
-                $response['blocks'][$id] = 'BLOCK NOT FOUND';
+                $response['blocks'][$id] = '<!-- BLOCK NOT FOUND -->';
             }
         }
 

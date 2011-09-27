@@ -1,59 +1,11 @@
 <?php /* @var $this Aoe_Static_Block_Beforebodyend */ ?>
-<?php if( ! Mage::registry('aoestatic')) return; ?>
 <?php $helper = Mage::registry('aoestatic'); /* @var $helper Aoe_Static_Helper_Data */ ?>
+<?php if($helper && $helper->useAjax()): ?>
 <script type="text/javascript">
 //<![CDATA[
-    <?php if('prototype' == $helper->getJslib()): ?>
-    function aoeStaticReplace(data) {
-        $H(data.blocks).each(function(block){
-            var el = $(block.key);
-            if(el) { el.replace(block.value); }
-        });
-    }
-    <?php elseif('jquery' == $helper->getJslib()): ?>
-    function aoeStaticReplace(data) {
-        for(var id in data.blocks) {
-            $('#' + id).html(data.blocks[id]);
-        }
-    }
-    <?php endif; ?>
-    <?php if($helper->useAjax()): ?>
-    if(aoeStaticUrl) {
-        <?php foreach($helper->getBlocks() as $htmlId => $nameInLayout): ?>
-        aoeStatic.blocks['<?php echo $htmlId ?>'] = '<?php echo $nameInLayout ?>';
-        <?php endforeach; ?>
-        <?php if('prototype' == $helper->getJslib()): ?>
-        document.observe('dom:loaded', function(){
-            $$('.placeholder').each(function(el) {
-              aoeStatic.blocks[el.id] = el.readAttribute('rel');
-            });
-            var ignored = Mage.Cookie.get('static_ignored').split(',');
-            aoeStatic.blocks = $H(aoeStatic.blocks).inject({}, function(acc, pair){
-                if( ! ignored.member(pair.value)) {
-                    acc[pair.key] = pair.value;
-                }
-                return acc;
-            });
-            if($H(aoeStatic.blocks).keys().length) {
-                new Ajax.Request(aoeStaticUrl, {
-                    parameters: {json: Object.toJSON(aoeStatic)},
-                    evalJSON: 'force',
-                    onSuccess: function(response) {
-                        aoeStaticReplace(response.responseJSON);
-                    }
-                });
-            }
-        });
-        <?php elseif('jquery' == $helper->getJslib()): ?>
-        jQuery(document).ready(function($) {
-            $('.placeholder').each(function() {
-                aoeStatic.blocks[$(this).attr('id')] = $(this).attr('rel');
-            });
-            // E.T. phone home
-            $.get(aoeStaticUrl, aoeStatic, aoeStaticReplace, 'json');
-        });
-        <?php endif; ?>
-    }
-    <?php endif; ?>
+    <?php foreach($helper->getDynamicBlocks() as $htmlId => $nameInLayout): ?>
+    fullPageCache.addBlock('<?php echo $htmlId ?>', '<?php echo $nameInLayout ?>'); 
+    <?php endforeach; ?>
 //]]>
 </script>
+<?php endif; ?>

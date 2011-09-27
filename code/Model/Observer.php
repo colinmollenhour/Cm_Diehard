@@ -30,8 +30,15 @@ class Aoe_Static_Model_Observer
             $fullActionName = $observer->getControllerAction()->getFullActionName();
 
             $lifetime = $this->helper()->isCacheableAction($fullActionName);
-            if ($lifetime) {
+            if ($lifetime)
+            {
+                // Set current request as cacheable for the given lifetime
                 $this->helper()->setLifetime($lifetime);
+
+                // Set default ignored blocks for new sessions
+                if( $this->helper()->getIgnoredBlocks() === NULL) {
+                    $this->helper()->addDefaultIgnoredBlocks();
+                }
             }
         }
     }
@@ -53,14 +60,13 @@ class Aoe_Static_Model_Observer
                 $this->helper()->getBackend()->httpResponseSendBefore($response, $lifetime);
             }
 
-            // Update static_ignored cookie
-            $cookies = Mage::getSingleton('core/cookie'); /* @var $cookies Mage_Core_Model_Cookie */
-            $ignored = explode(',',$cookies->get('static_ignored'));
+            // Update ignored blocks cookie
+            $ignored = (array) $this->helper()->getIgnoredBlocks();
             $addedIgnored = $this->helper()->getAddedIgnoredBlocks();
             $removedIgnored = $this->helper()->getRemovedIgnoredBlocks();
             $ignored = array_unique(array_merge($ignored, $addedIgnored));
             $ignored = array_diff($ignored, $removedIgnored);
-            $cookies->set('static_ignored', implode(',',$ignored));
+            $this->helper()->setIgnoredBlocks($ignored);
 
             // Add debug data
             if($this->helper()->isDebug()) {
@@ -75,7 +81,8 @@ class Aoe_Static_Model_Observer
     /**
      * Observe all cleaned cache tags to purge cached pages.
      *
-     * TODO - this will not work since cache is already cleaned before this point...
+     * This event runs after the cache is cleaned so if a backend needs to take action on some
+     * cache data before it is cleaned it must keep a separate cache storage.
      *
      * @param Varien_Event_Observer $observer
      * @return void

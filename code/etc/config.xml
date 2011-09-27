@@ -34,6 +34,18 @@
                 </aoestatic>
             </types>
         </cache>
+        <events>
+            <!-- When cache tags are cleaned, invalidate cached pages -->
+            <application_clean_cache>
+                <observers>
+                    <aoestatic>
+                        <type>singleton</type>
+                        <class>aoestatic/observer</class>
+                        <method>applicationCleanCache</method>
+                    </aoestatic>
+                </observers>
+            </application_clean_cache>
+        </events>
     </global>
 
     <frontend>
@@ -54,7 +66,6 @@
             </aoestatic>
         </routers>
         <events>
-
             <!-- Check if cache should be enabled -->
             <controller_action_predispatch>
                 <observers>
@@ -76,17 +87,6 @@
                     </aoestatic>
                 </observers>
             </http_response_send_before>
-
-            <!-- When cache tags are cleaned, invalidate cached pages -->
-            <application_clean_cache>
-                <observers>
-                    <aoestatic>
-                        <type>singleton</type>
-                        <class>aoestatic/observer</class>
-                        <method>applicationCleanCache</method>
-                    </aoestatic>
-                </observers>
-            </application_clean_cache>
 
             <!-- Collect all loaded cache tags to associate with page -->
             <model_load_after>
@@ -118,12 +118,31 @@
                 <model>aoestatic/backend_magento</model>
             </magento>
         </backends>
+
+        <!-- Supported javascript libraries for dynamic block replacement -->
+        <jslibs>
+            <prototype>
+                <label>Prototype (default)</label>
+                <path>aoestatic/fpc-prototype.js</path>
+            </prototype>
+            <jquery>
+                <label>jQuery</label>
+                <path>aoestatic/fpc-jquery.js</path>
+            </jquery>
+        </jslibs>
+
+        <!-- Blocks that are ignored for fresh sessions (ignored by default) -->
+        <ignored>
+            <foo/>
+            <bar/>
+        </ignored>
     </aoestatic>
     
     <default>
         <system>
             <aoe_static>
-                <jslib>prototype</jslib>
+                <usejs>1</usejs>
+                <jslib>aoestatic/fpc-prototype.js</jslib>
                 <cache_control>public, must-revalidate, s-maxage=%d</cache_control>
             </aoe_static>
         </system>
