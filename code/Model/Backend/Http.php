@@ -9,7 +9,7 @@
 abstract class Aoe_Static_Model_Backend_Http extends Aoe_Static_Model_Backend_Abstract
 {
 
-    const CACHE_TAG = 'AEOSTATIC_URLS';
+    const CACHE_TAG = 'AOESTATIC_URLS';
     const PREFIX_TAG = 'AOESTATIC_URLS_';
     const PREFIX_KEY = 'URL_';
 

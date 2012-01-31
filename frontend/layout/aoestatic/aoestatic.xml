@@ -3,7 +3,7 @@
 
         <!-- Add javascript for appropriate supported library -->
         <reference name="head">
-            <action method="addJs" ifconfig="system/aoe_static/usejs"><script helper="aeostatic/getJsLib" /></action>
+            <action method="addJs" ifconfig="system/aoe_static/usejs"><script helper="aoestatic/getJsLib" /></action>
         </reference>
 
         <!-- Initialize javascript object and dom:loaded event -->
