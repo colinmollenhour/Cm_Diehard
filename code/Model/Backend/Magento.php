@@ -125,10 +125,10 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             }
 
             // Create a subrequest
-            $request = new Mage_Core_Controller_Request_Http('phone/call/index');
-            $request->setModuleName('phone');
-            $request->setControllerName('call');
-            $request->setActionName('index');
+            $request = new Mage_Core_Controller_Request_Http('_diehard/load/ajax');
+            $request->setModuleName('_diehard');
+            $request->setControllerName('load');
+            $request->setActionName('ajax');
             $request->setControllerModule('Cm_Diehard');
             // TODO $request->setParam('full_action_name', ???);
             $request->setParam('blocks', $dynamicBlocks);
@@ -137,7 +137,7 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             $controller->preDispatch();
             $controller->dispatch('index');
 
-            return "<script type=\"text/javascript\">FullPageCache.replaceBlocks({$response->getBody()});</script>";
+            return "<script type=\"text/javascript\">Diehard.replaceBlocks({$response->getBody()});</script>";
         }
 
         // No dynamic blocks at this time

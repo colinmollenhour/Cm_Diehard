@@ -4,7 +4,7 @@
 <script type="text/javascript">
 //<![CDATA[
     <?php foreach($helper->getDynamicBlocks() as $htmlId => $nameInLayout): ?>
-    fullPageCache.addBlock('<?php echo $htmlId ?>', '<?php echo $nameInLayout ?>'); 
+    diehard.addBlock('<?php echo $htmlId ?>', '<?php echo $nameInLayout ?>');
     <?php endforeach; ?>
 //]]>
 </script>

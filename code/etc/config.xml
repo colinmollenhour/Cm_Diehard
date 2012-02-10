@@ -61,7 +61,7 @@
                 <use>standard</use>
                 <args>
                     <module>Cm_Diehard</module>
-                    <frontName>phone</frontName>
+                    <frontName>_diehard</frontName>
                 </args>
             </diehard>
         </routers>

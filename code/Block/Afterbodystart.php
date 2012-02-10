@@ -11,13 +11,13 @@ class Cm_Diehard_Block_Afterbodystart extends Mage_Core_Block_Template
     /**
      * @return string
      */
-    public function getPhoneUrl()
+    public function getLoadAjaxUrl()
     {
         $params = array();
         if(Mage::app()->getStore()->isCurrentlySecure()) {
             $params['_secure'] = TRUE;
         }
-        return Mage::getUrl('phone/call/index', $params);
+        return Mage::getUrl('_diehard/load/ajax', $params);
     }
 
 }

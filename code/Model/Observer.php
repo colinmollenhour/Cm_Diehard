@@ -68,10 +68,10 @@ class Cm_Diehard_Model_Observer
 
             // Add debug data
             if($this->helper()->isDebug()) {
-                $response->setHeader('X-FullPageCache', "$fullActionName-$lifetime", true);
-                $response->setHeader('X-FullPageCache-Tags', implode('|', $this->helper()->getTags()), true);
-                $response->setHeader('X-FullPageCache-AddedIgnoredBlocks', implode('|',$addedIgnored), true);
-                $response->setHeader('X-FullPageCache-RemovedIgnoredBlocks', implode('|',$removedIgnored), true);
+                $response->setHeader('X-Diehard', "$fullActionName-$lifetime", true);
+                $response->setHeader('X-Diehard-Tags', implode('|', $this->helper()->getTags()), true);
+                $response->setHeader('X-Diehard-AddedIgnoredBlocks', implode('|',$addedIgnored), true);
+                $response->setHeader('X-Diehard-RemovedIgnoredBlocks', implode('|',$removedIgnored), true);
             }
         }
     }

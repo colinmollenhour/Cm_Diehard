@@ -1,5 +1,5 @@
-var FullPageCache = Class.create();
-FullPageCache.prototype =
+var Diehard = Class.create();
+Diehard.prototype =
 {
     initialize: function(url, action) {
         this.url = url;
@@ -39,13 +39,13 @@ FullPageCache.prototype =
                 parameters: {json: Object.toJSON(this.params)},
                 evalJSON: 'force',
                 onSuccess: function(response) {
-                    FullPageCache.replaceBlocks(response.responseJSON);
+                    Diehard.replaceBlocks(response.responseJSON);
                 }.bind(this)
             });
         }
     }
 };
-FullPageCache.replaceBlocks = function(data) {
+Diehard.replaceBlocks = function(data) {
     $H(data.blocks).each(function(block){
         var el = $(block.key);
         if(el) { el.replace(block.value); }

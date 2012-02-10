@@ -12,7 +12,7 @@ class Cm_Diehard_CallController extends Mage_Core_Controller_Front_Action
     /**
      * Index action. This action is called by an ajax request
      */
-    public function indexAction() {
+    public function ajaxAction() {
 
         // if (!$this->getRequest()->isXmlHttpRequest()) { Mage::throwException('This is not an XmlHttpRequest'); }
 
