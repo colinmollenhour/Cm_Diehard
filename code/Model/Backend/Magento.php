@@ -13,11 +13,10 @@
  *
  * TODO: extend this with a version which uses a separate cache backend so primary cache is not affected
  *
- * @category    Aoe
- * @package     Aoe_Static
+ * @package     Cm_Diehard
  * @author      Colin Mollenhour
  */
-class Aoe_Static_Model_Backend_Magento extends Aoe_Static_Model_Backend_Abstract
+class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
 {
 
     protected $_useAjax = TRUE;
@@ -31,7 +30,7 @@ class Aoe_Static_Model_Backend_Magento extends Aoe_Static_Model_Backend_Abstract
      */
     public function flush()
     {
-        Mage::app()->getCacheInstance()->cleanType('aoestatic');
+        Mage::app()->getCacheInstance()->cleanType('diehard');
     }
 
     /**
@@ -53,12 +52,12 @@ class Aoe_Static_Model_Backend_Magento extends Aoe_Static_Model_Backend_Abstract
     public function httpResponseSendBefore(Mage_Core_Controller_Response_Http $response, $lifetime)
     {
         // Do not overwrite cached response if response was pulled from cache or cached response
-        // was invalidated by an observer of the `aoestatic_use_cached_response` event
+        // was invalidated by an observer of the `diehard_use_cached_response` event
         if ($this->getUseCachedResponse() === NULL)
         {
             $cacheKey = $this->getCacheKey();
             $tags = $this->helper()->getTags();
-            $tags[] = Aoe_Static_Helper_Data::CACHE_TAG;
+            $tags[] = Cm_Diehard_Helper_Data::CACHE_TAG;
             Mage::app()->saveCache($response->getBody(), $cacheKey, $tags, $lifetime);
         }
 
@@ -97,7 +96,7 @@ class Aoe_Static_Model_Backend_Magento extends Aoe_Static_Model_Backend_Abstract
             $this->setUseCachedResponse(TRUE);
 
             // Event allows observers to cancel the sending of a cached response
-            Mage::dispatchEvent('aoestatic_use_cached_response', array(
+            Mage::dispatchEvent('diehard_use_cached_response', array(
                 'backend' => $this,
             ));
 
@@ -130,11 +129,11 @@ class Aoe_Static_Model_Backend_Magento extends Aoe_Static_Model_Backend_Abstract
             $request->setModuleName('phone');
             $request->setControllerName('call');
             $request->setActionName('index');
-            $request->setControllerModule('Aoe_Static');
+            $request->setControllerModule('Cm_Diehard');
             // TODO $request->setParam('full_action_name', ???);
             $request->setParam('blocks', $dynamicBlocks);
             $response = new Mage_Core_Controller_Response_Http;
-            $controller = new Aoe_Static_CallController($request, $response);
+            $controller = new Cm_Diehard_CallController($request, $response);
             $controller->preDispatch();
             $controller->dispatch('index');
 

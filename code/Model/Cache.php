@@ -1,6 +1,6 @@
 <?php
 
-class Aoe_Static_Model_Cache extends Mage_Core_Model_Cache
+class Cm_Diehard_Model_Cache extends Mage_Core_Model_Cache
 {
 
     /**
@@ -8,8 +8,8 @@ class Aoe_Static_Model_Cache extends Mage_Core_Model_Cache
      */
     public function flush()
     {
-        if(Mage::helper('aoestatic')->getBackendType() != 'aoestatic/magento') {
-            Mage::helper('aoestatic')->flush();
+        if(Mage::helper('diehard')->getBackendType() != 'diehard/magento') {
+            Mage::helper('diehard')->flush();
         }
         return parent::flush();
     }
@@ -20,8 +20,8 @@ class Aoe_Static_Model_Cache extends Mage_Core_Model_Cache
      */
     public function cleanType($typeCode)
     {
-        if($typeCode == 'aoestatic' && Mage::helper('aoestatic')->getBackendType() != 'aoestatic/magento') {
-            Mage::helper('aoestatic')->flush();
+        if($typeCode == 'diehard' && Mage::helper('diehard')->getBackendType() != 'diehard/magento') {
+            Mage::helper('diehard')->flush();
         }
         return parent::cleanType($typeCode);
     }

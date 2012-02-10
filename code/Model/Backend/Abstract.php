@@ -2,11 +2,10 @@
 /**
  * Abstract backend driver model
  *
- * @category    Aoe
- * @package     Aoe_Static
+ * @package     Cm_Diehard
  * @author      Colin Mollenhour
  */
-abstract class Aoe_Static_Model_Backend_Abstract
+abstract class Cm_Diehard_Model_Backend_Abstract
 {
 
     /**
@@ -17,11 +16,11 @@ abstract class Aoe_Static_Model_Backend_Abstract
     protected $_useAjax;
 
     /**
-     * @return Aoe_Static_Helper_Data
+     * @return Cm_Diehard_Helper_Data
      */
     public function helper()
     {
-        return Mage::helper('aoestatic');
+        return Mage::helper('diehard');
     }
 
     /**
@@ -30,7 +29,7 @@ abstract class Aoe_Static_Model_Backend_Abstract
     public function getCacheKey()
     {
         return implode('_',array(
-            'AOESTATIC',
+            'DIEHARD',
             Mage::app()->getStore()->getId(),
             Mage::app()->getRequest()->getScheme(),
             Mage::app()->getRequest()->getHttpHost(FALSE),

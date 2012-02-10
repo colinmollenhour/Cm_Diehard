@@ -3,22 +3,20 @@
 /**
  * Data helper
  *
- * @category    Aoe
- * @package     Aoe_Static
- * @author      Toni Grigoriu <toni@tonigrigoriu.com>
+ * @package     Cm_Diehard
  * @author      Colin Mollenhour
  */
-class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
+class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
 {
 
-    const XML_PATH_BACKEND              = 'system/aoe_static/backend';
-    const XML_PATH_DEBUG                = 'system/aoe_static/debug';
-    const XML_PATH_JSLIB                = 'system/aoe_static/jslib';
+    const XML_PATH_BACKEND              = 'system/diehard/backend';
+    const XML_PATH_DEBUG                = 'system/diehard/debug';
+    const XML_PATH_JSLIB                = 'system/diehard/jslib';
 
-    const CACHE_TAG = 'AOESTATIC';
+    const CACHE_TAG = 'DIEHARD';
 
     /** Cookie key for list of ignored blocks */
-    const COOKIE_IGNORED_BLOCKS = 'static_ignored';
+    const COOKIE_IGNORED_BLOCKS = 'diehard_ignored';
 
     protected $_lifetime = FALSE;
 
@@ -37,7 +35,7 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
     {
         static $enabled = NULL;
         if($enabled === NULL) {
-            $enabled = Mage::app()->useCache('aoestatic') && Mage::getStoreConfig(self::XML_PATH_BACKEND);
+            $enabled = Mage::app()->useCache('diehard') && Mage::getStoreConfig(self::XML_PATH_BACKEND);
         }
         return $enabled;
     }
@@ -153,7 +151,7 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function addDefaultIgnoredBlocks()
     {
-        foreach(Mage::getConfig()->getNode('aoestatic/ignored')->asArray() as $block => $_) {
+        foreach(Mage::getConfig()->getNode('diehard/ignored')->asArray() as $block => $_) {
             $this->addIgnoredBlock($block);
         }
     }
@@ -211,7 +209,7 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isCacheableAction($fullActionName)
     {
-        $lifeTime = Mage::app()->getConfig()->getNode('aoestatic/actions/'.$fullActionName);
+        $lifeTime = Mage::app()->getConfig()->getNode('diehard/actions/'.$fullActionName);
         if($lifeTime) {
             return intval($lifeTime);
         }
@@ -224,7 +222,7 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
     public function getBackendModel()
     {
         $backend = Mage::getStoreConfig(self::XML_PATH_BACKEND);
-        return (string) Mage::getConfig()->getNode('aoestatic/backends/'.$backend.'/model');
+        return (string) Mage::getConfig()->getNode('diehard/backends/'.$backend.'/model');
     }
 
     /**
@@ -233,11 +231,11 @@ class Aoe_Static_Helper_Data extends Mage_Core_Helper_Abstract
     public function getBackendLabel()
     {
         $backend = Mage::getStoreConfig(self::XML_PATH_BACKEND);
-        return (string) Mage::getConfig()->getNode('aoestatic/backends/'.$backend.'/label');
+        return (string) Mage::getConfig()->getNode('diehard/backends/'.$backend.'/label');
     }
 
     /**
-     * @return Aoe_Static_Model_Backend_Abstract
+     * @return Cm_Diehard_Model_Backend_Abstract
      */
     public function getBackend()
     {

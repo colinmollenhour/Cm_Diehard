@@ -24,7 +24,7 @@ FullPageCache.prototype =
         }.bind(this));
 
         // Remove ignored blocks
-        var ignored = Mage.Cookie.get('static_ignored').split(',');
+        var ignored = Mage.Cookie.get('diehard_ignored').split(',');
         this.blocks = $H(this.blocks).inject({}, function(acc, pair){
             if( ! ignored.member(pair.value)) {
                 acc[pair.key] = pair.value;

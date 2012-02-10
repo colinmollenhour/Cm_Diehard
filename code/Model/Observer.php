@@ -2,18 +2,16 @@
 /**
  * Observer model
  *
- * @category    Aoe
- * @package     Aoe_Static
- * @author      Toni Grigoriu <toni@tonigrigoriu.com>
+ * @package     Cm_Diehard
  * @author      Colin Mollenhour
  */
-class Aoe_Static_Model_Observer
+class Cm_Diehard_Model_Observer
 {
 
-    /** @return Aoe_Static_Helper_Data */
+    /** @return Cm_Diehard_Helper_Data */
     public function helper()
     {
-        return Mage::helper('aoestatic');
+        return Mage::helper('diehard');
     }
 
     /**
@@ -25,7 +23,7 @@ class Aoe_Static_Model_Observer
     public function processPreDispatch(Varien_Event_Observer $observer)
     {
         if($this->helper()->isEnabled() && Mage::app()->getRequest()->isGet()) {
-            Mage::register('aoestatic', $this->helper());
+            Mage::register('diehard', $this->helper());
 
             $fullActionName = $observer->getControllerAction()->getFullActionName();
 

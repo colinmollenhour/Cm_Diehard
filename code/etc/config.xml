@@ -2,47 +2,47 @@
 <config>
 
     <modules>
-        <Aoe_Static>
+        <Cm_Diehard>
             <active>true</active>
             <codePool>local</codePool>
             <version>0.0.1</version>
-        </Aoe_Static>
+        </Cm_Diehard>
     </modules>
 
     <global>
         <blocks>
-            <aoestatic>
-                <class>Aoe_Static_Block</class>
-            </aoestatic>
+            <diehard>
+                <class>Cm_Diehard_Block</class>
+            </diehard>
         </blocks>
         <models>
-            <aoestatic>
-                <class>Aoe_Static_Model</class>
-            </aoestatic>
+            <diehard>
+                <class>Cm_Diehard_Model</class>
+            </diehard>
         </models>
         <helpers>
-            <aoestatic>
-                <class>Aoe_Static_Helper</class>
-            </aoestatic>
+            <diehard>
+                <class>Cm_Diehard_Helper</class>
+            </diehard>
         </helpers>
         <cache>
             <types>
-                <aoestatic translate="label,description" module="aoestatic">
+                <diehard translate="label,description" module="diehard">
                     <label>Full Page Cache</label>
-                    <description>Full Page Cache provided by Aoe_Static</description>
-                    <tags>AOESTATIC,AOESTATIC_URLS</tags>
-                </aoestatic>
+                    <description>Full Page Cache provided by Cm_Diehard</description>
+                    <tags>DIEHARD,DIEHARD_URLS</tags>
+                </diehard>
             </types>
         </cache>
         <events>
             <!-- When cache tags are cleaned, invalidate cached pages -->
             <application_clean_cache>
                 <observers>
-                    <aoestatic>
+                    <diehard>
                         <type>singleton</type>
-                        <class>aoestatic/observer</class>
+                        <class>diehard/observer</class>
                         <method>applicationCleanCache</method>
-                    </aoestatic>
+                    </diehard>
                 </observers>
             </application_clean_cache>
         </events>
@@ -51,57 +51,57 @@
     <frontend>
         <layout>
             <updates>
-                <aoestatic>
-                    <file>aoestatic/aoestatic.xml</file>
-                </aoestatic>
+                <diehard>
+                    <file>diehard/diehard.xml</file>
+                </diehard>
             </updates>
         </layout>
         <routers>
-            <aoestatic>
+            <diehard>
                 <use>standard</use>
                 <args>
-                    <module>Aoe_Static</module>
+                    <module>Cm_Diehard</module>
                     <frontName>phone</frontName>
                 </args>
-            </aoestatic>
+            </diehard>
         </routers>
         <events>
             <!-- Check if cache should be enabled -->
             <controller_action_predispatch>
                 <observers>
-                    <aoestatic>
+                    <diehard>
                         <type>singleton</type>
-                        <class>aoestatic/observer</class>
+                        <class>diehard/observer</class>
                         <method>processPreDispatch</method>
-                    </aoestatic>
+                    </diehard>
                 </observers>
             </controller_action_predispatch>
 
             <!-- If cache is enabled, let backend cache response -->
             <http_response_send_before>
                 <observers>
-                    <aoestatic>
+                    <diehard>
                         <type>singleton</type>
-                        <class>aoestatic/observer</class>
+                        <class>diehard/observer</class>
                         <method>httpResponseSendBefore</method>
-                    </aoestatic>
+                    </diehard>
                 </observers>
             </http_response_send_before>
 
             <!-- Collect all loaded cache tags to associate with page -->
             <model_load_after>
                 <observers>
-                    <aoestatic>
+                    <diehard>
                         <type>singleton</type>
-                        <class>aoestatic/observer</class>
+                        <class>diehard/observer</class>
                         <method>modelLoadAfter</method>
-                    </aoestatic>
+                    </diehard>
                 </observers>
             </model_load_after>
         </events>
     </frontend>
 
-    <aoestatic>
+    <diehard>
 
         <!-- Cacheable actions and their lifetimes -->
         <actions>
@@ -115,7 +115,7 @@
         <backends>
             <magento>
                 <label>Magento Cache</label>
-                <model>aoestatic/backend_magento</model>
+                <model>diehard/backend_magento</model>
             </magento>
         </backends>
 
@@ -123,11 +123,11 @@
         <jslibs>
             <prototype>
                 <label>Prototype (default)</label>
-                <path>aoestatic/fpc-prototype.js</path>
+                <path>diehard/fpc-prototype.js</path>
             </prototype>
             <jquery>
                 <label>jQuery</label>
-                <path>aoestatic/fpc-jquery.js</path>
+                <path>diehard/fpc-jquery.js</path>
             </jquery>
         </jslibs>
 
@@ -136,15 +136,15 @@
             <foo/>
             <bar/>
         </ignored>
-    </aoestatic>
+    </diehard>
     
     <default>
         <system>
-            <aoe_static>
+            <diehard>
                 <usejs>1</usejs>
-                <jslib>aoestatic/fpc-prototype.js</jslib>
+                <jslib>diehard/fpc-prototype.js</jslib>
                 <cache_control>public, must-revalidate, s-maxage=%d</cache_control>
-            </aoe_static>
+            </diehard>
         </system>
         <dev>
             <template>

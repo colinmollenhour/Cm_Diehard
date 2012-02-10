@@ -2,15 +2,14 @@
 /**
  * Observer model
  *
- * @category    Aoe
- * @package     Aoe_Static
+ * @package     Cm_Diehard
  * @author      Colin Mollenhour
  */
-abstract class Aoe_Static_Model_Backend_Http extends Aoe_Static_Model_Backend_Abstract
+abstract class Cm_Diehard_Model_Backend_Http extends Cm_Diehard_Model_Backend_Abstract
 {
 
-    const CACHE_TAG = 'AOESTATIC_URLS';
-    const PREFIX_TAG = 'AOESTATIC_URLS_';
+    const CACHE_TAG = 'DIEHARD_URLS';
+    const PREFIX_TAG = 'DIEHARD_URLS_';
     const PREFIX_KEY = 'URL_';
 
     protected $_useAjax = TRUE;
@@ -25,7 +24,7 @@ abstract class Aoe_Static_Model_Backend_Http extends Aoe_Static_Model_Backend_Ab
         Mage::app()->saveCache($url, self::PREFIX_KEY.$cacheKey, $tags, $lifetime);
 
         // Set a header so the page is cached
-        $cacheControl = sprintf(Mage::getStoreConfig('system/aoe_static/cachecontrol'), $lifetime);
+        $cacheControl = sprintf(Mage::getStoreConfig('system/diehard/cachecontrol'), $lifetime);
         $response->setHeader('Cache-Control', $cacheControl, true);
     }
 

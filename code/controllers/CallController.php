@@ -4,17 +4,13 @@
  * CallController
  * Renders the block that are requested via an ajax call
  *
- * @author Fabrizio Branca <fabrizio.branca@aoemedia.de>
+ * @author Colin Mollenhour
  */
-class Aoe_Static_CallController extends Mage_Core_Controller_Front_Action {
-
-
+class Cm_Diehard_CallController extends Mage_Core_Controller_Front_Action
+{
 
     /**
      * Index action. This action is called by an ajax request
-     *
-     * @return void
-     * @author Fabrizio Branca <fabrizio.branca@aoemedia.de>
      */
     public function indexAction() {
 
@@ -34,8 +30,8 @@ class Aoe_Static_CallController extends Mage_Core_Controller_Front_Action {
         // Add handles to layout
         $handles = array(
             'default',
-            'AOESTATIC_default',
-            'AOESTATIC_'.$this->getRequest()->getParam('full_action_name')
+            'DIEHARD_default',
+            'DIEHARD_'.$this->getRequest()->getParam('full_action_name')
         );
         $this->loadLayout($handles);
         $layout = $this->getLayout();

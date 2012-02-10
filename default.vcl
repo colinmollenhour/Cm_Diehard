@@ -8,7 +8,7 @@ backend default {
 Like the default function, only that cookies don't prevent caching
 */
 sub vcl_recv {
-#	if (req.http.Host != "varnish.demo.aoemedia.de") {
+#	if (req.http.Host != "example.com") {
 #		return (pipe);
 #	}
 
@@ -74,7 +74,7 @@ sub vcl_fetch {
 	if (beresp.status == 302 || beresp.status == 301 || beresp.status == 418) {
 		return (pass);
 	}
-	if (beresp.http.aoestatic == "cache") {
+	if (beresp.http.diehard == "cache") {
 		remove beresp.http.Set-Cookie;
 		remove beresp.http.X-Cache;
 		remove beresp.http.Server;
@@ -82,9 +82,9 @@ sub vcl_fetch {
 		remove beresp.http.Pragma;
 		set beresp.http.Cache-Control = "public";
 		set beresp.grace = 2m;
-		set beresp.http.X_AOESTATIC_FETCH = "Removed cookie in vcl_fetch";
+		set beresp.http.X_DIEHARD_FETCH = "Removed cookie in vcl_fetch";
 	} else {
-		set beresp.http.X_AOESTATIC_FETCH = "Nothing removed";
+		set beresp.http.X_DIEHARD_FETCH = "Nothing removed";
 	}
 
 	# Some known-static file types

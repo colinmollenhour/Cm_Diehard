@@ -3,8 +3,8 @@
 /**
  * Beforebodyend block
  *
- * @author Fabrizio Branca
+ * @author Colin Mollenhour
  */
-class Aoe_Static_Block_Beforebodyend extends Mage_Core_Block_Template 
+class Cm_Diehard_Block_Beforebodyend extends Mage_Core_Block_Template
 {
 }

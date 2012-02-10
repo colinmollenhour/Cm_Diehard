@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <modules>
-        <Aoe_Static>
+        <Cm_Diehard>
             <active>true</active>
-            <codePool>local</codePool>
-        </Aoe_Static>
+            <codePool>community</codePool>
+        </Cm_Diehard>
     </modules>
 </config>

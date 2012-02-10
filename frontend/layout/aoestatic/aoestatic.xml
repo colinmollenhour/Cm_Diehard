@@ -3,17 +3,17 @@
 
         <!-- Add javascript for appropriate supported library -->
         <reference name="head">
-            <action method="addJs" ifconfig="system/aoe_static/usejs"><script helper="aoestatic/getJsLib" /></action>
+            <action method="addJs" ifconfig="system/diehard/usejs"><script helper="diehard/getJsLib" /></action>
         </reference>
 
         <!-- Initialize javascript object and dom:loaded event -->
         <reference name="after_body_start">
-            <block type="aoestatic/afterbodystart" name="aoestatic_start" template="aoestatic/afterbodystart.phtml" />
+            <block type="diehard/afterbodystart" name="diehard_start" template="diehard/afterbodystart.phtml" />
         </reference>
 
         <!-- Add all dynamic blocks before ajax request -->
         <reference name="before_body_end">
-            <block type="aoestatic/beforebodyend" name="aoestatic_end" template="aoestatic/beforebodyend.phtml"></block>
+            <block type="diehard/beforebodyend" name="diehard_end" template="diehard/beforebodyend.phtml"></block>
         </reference>
 
     </default>

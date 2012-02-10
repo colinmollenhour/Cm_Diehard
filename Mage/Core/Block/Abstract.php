@@ -1182,16 +1182,16 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
         return $this;
     }
 
-    /** Additions for Aoe_Static module */
+    /** Additions for Cm_Diehard module */
     /* TODO - reimplement as event observer? */
     public function setBlockIsDynamic($htmlId = '')
     {
-        if(Mage::helper('aoestatic')->getLifetime()) {
+        if(Mage::helper('diehard')->getLifetime()) {
             if( ! $htmlId) {
                 $htmlId = 'db_'.preg_replace('/[^a-zA-Z0-9]+/', '_', $this->getNameInLayout());
                 $this->setFrameTags('div id="'.$htmlId."'", 'div');
             }
-            Mage::helper('aoestatic')->addDynamicBlock($htmlId, $this->getNameInLayout());
+            Mage::helper('diehard')->addDynamicBlock($htmlId, $this->getNameInLayout());
         }
         return parent::setData('block_is_dynamic', TRUE);
     }
