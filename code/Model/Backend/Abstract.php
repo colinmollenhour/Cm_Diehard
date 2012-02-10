@@ -8,6 +8,10 @@
 abstract class Cm_Diehard_Model_Backend_Abstract
 {
 
+    protected $_name = '';
+
+    protected $_cacheKey;
+
     /**
      * If true, JS will be inserted to fetch dynamic content via Ajax
      * 
@@ -24,18 +28,26 @@ abstract class Cm_Diehard_Model_Backend_Abstract
     }
 
     /**
+     * Set lazily and only once
+     *
      * @return string
      */
     public function getCacheKey()
     {
-        return implode('_',array(
-            'DIEHARD',
-            Mage::app()->getStore()->getId(),
-            Mage::app()->getRequest()->getScheme(),
-            Mage::app()->getRequest()->getHttpHost(FALSE),
-            Mage::app()->getRequest()->getRequestUri(),
-            // Design?
-        ));
+        if( ! $this->_cacheKey) {
+            $cacheKeyInfo = array(
+                'DIEHARD',
+                $this->_name,
+                Mage::app()->getStore()->getId(),
+                Mage::app()->getRequest()->getScheme(),
+                Mage::app()->getRequest()->getHttpHost(FALSE),
+                Mage::app()->getRequest()->getRequestUri(),
+                // Design?
+            );
+            // TODO - need some method besides events for allowing other modules to add cache key info
+            $this->_cacheKey = implode('_', $cacheKeyInfo);
+        }
+        return $this->_cacheKey;
     }
 
     /**

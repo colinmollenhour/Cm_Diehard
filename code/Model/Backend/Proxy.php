@@ -1,16 +1,19 @@
 <?php
 /**
- * Observer model
+ * This backend assumes the use of a reverse proxy and dumps urls to invalidate out to
+ * plain text files so that cache clearing can happen externally.
  *
  * @package     Cm_Diehard
  * @author      Colin Mollenhour
  */
-abstract class Cm_Diehard_Model_Backend_Http extends Cm_Diehard_Model_Backend_Abstract
+abstract class Cm_Diehard_Model_Backend_Proxy extends Cm_Diehard_Model_Backend_Abstract
 {
 
     const CACHE_TAG = 'DIEHARD_URLS';
     const PREFIX_TAG = 'DIEHARD_URLS_';
     const PREFIX_KEY = 'URL_';
+
+    protected $_name = 'Proxy';
 
     protected $_useAjax = TRUE;
     

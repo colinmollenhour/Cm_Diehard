@@ -13,11 +13,22 @@
  *
  * TODO: extend this with a version which uses a separate cache backend so primary cache is not affected
  *
+ * To use this backend you must add it to the cache request processors in app/etc/local.xml:
+ *
+ * <cache>
+ *   <request_processors>
+ *     <diehard>Cm_Diehard_Model_Backend_Revalidate</diehard>
+ *   </request_processors>
+ *   ...
+ * </cache>
+ *
  * @package     Cm_Diehard
  * @author      Colin Mollenhour
  */
 class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
 {
+
+    protected $_name = 'Magento';
 
     protected $_useAjax = TRUE;
 
