@@ -117,6 +117,18 @@
                 <label>Magento Cache</label>
                 <model>diehard/backend_magento</model>
             </magento>
+            <file>
+                <label>File Cache</label>
+                <model>diehard/backend_file</model>
+            </file>
+            <proxy>
+                <label>Basic Reverse-Proxy Cache</label>
+                <model>diehard/backend_proxy</model>
+            </proxy>
+            <revalidating>
+                <label>Re-validating Reverse-Proxy Cache</label>
+                <model>diehard/backend_revalidating</model>
+            </revalidating>
         </backends>
 
         <!-- Supported javascript libraries for dynamic block replacement -->

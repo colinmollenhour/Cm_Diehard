@@ -17,7 +17,7 @@
  *
  * <cache>
  *   <request_processors>
- *     <diehard>Cm_Diehard_Model_Backend_Revalidate</diehard>
+ *     <diehard>Cm_Diehard_Model_Backend_Magento</diehard>
  *   </request_processors>
  *   ...
  * </cache>
@@ -107,6 +107,7 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             $this->setUseCachedResponse(TRUE);
 
             // Event allows observers to cancel the sending of a cached response
+            // TODO - I don't think events can be used here since they are not yet initialized
             Mage::dispatchEvent('diehard_use_cached_response', array(
                 'backend' => $this,
             ));
@@ -144,9 +145,9 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             // TODO $request->setParam('full_action_name', ???);
             $request->setParam('blocks', $dynamicBlocks);
             $response = new Mage_Core_Controller_Response_Http;
-            $controller = new Cm_Diehard_CallController($request, $response);
+            $controller = new Cm_Diehard_LoadController($request, $response);
             $controller->preDispatch();
-            $controller->dispatch('index');
+            $controller->dispatch('ajax');
 
             return "<script type=\"text/javascript\">Diehard.replaceBlocks({$response->getBody()});</script>";
         }

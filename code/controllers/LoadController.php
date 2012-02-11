@@ -6,7 +6,7 @@
  *
  * @author Colin Mollenhour
  */
-class Cm_Diehard_CallController extends Mage_Core_Controller_Front_Action
+class Cm_Diehard_LoadController extends Mage_Core_Controller_Front_Action
 {
 
     /**

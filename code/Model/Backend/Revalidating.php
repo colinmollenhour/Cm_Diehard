@@ -1,6 +1,6 @@
 <?php
 /**
- * This backend uses HTTP headers to tell the receiver to cache the page, but revalidate the cache.
+ * This backend uses HTTP/1.1 headers to tell the receiver to cache the page, but revalidate the cache.
  * The revalidation is done within Magento to allow for advanced invalidation (e.g. cookies).
  *
  * ETags are used to communicate if the cached content is stale so make sure your proxy
@@ -12,7 +12,7 @@
  *
  * <cache>
  *   <request_processors>
- *     <diehard>Cm_Diehard_Model_Backend_Revalidate</diehard>
+ *     <diehard>Cm_Diehard_Model_Backend_Revalidating</diehard>
  *   </request_processors>
  *   ...
  * </cache>
@@ -22,11 +22,8 @@
  * @package     Cm_Diehard
  * @author      Colin Mollenhour
  */
-abstract class Cm_Diehard_Model_Backend_Revalidate extends Cm_Diehard_Model_Backend_Abstract
+abstract class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Backend_Abstract
 {
-
-    const CACHE_TAG = 'DIEHARD_URLS';
-    const PREFIX_TAG = 'DIEHARD_URLS_';
 
     protected $_name = 'Proxy';
 
@@ -59,16 +56,27 @@ abstract class Cm_Diehard_Model_Backend_Revalidate extends Cm_Diehard_Model_Back
      */
     public function httpResponseSendBefore(Mage_Core_Controller_Response_Http $response, $lifetime)
     {
-        $cacheKey = $this->getCacheKey();
-        $etag = sha1(microtime().mt_rand());
-        $tags = $this->helper()->getTags();
-        $tags[] = self::CACHE_TAG;
-        Mage::app()->saveCache($etag, $cacheKey, $tags, $lifetime);
+        $useEtags = Mage::getStoreConfigFlag('system/diehard/use_etags');
+        if($useEtags) {
+            $cacheData = sha1(microtime().mt_rand());
+        } else {
+            $cacheData = $this->_rfc1123Date();
+        }
 
-        // Set headers so the page is cached with the ETag value for invalidation
+        $cacheKey = $this->getCacheKey();
+        $tags = $this->helper()->getTags();
+        $tags[] = Cm_Diehard_Helper_Data::CACHE_TAG;
+        Mage::app()->saveCache($cacheData, $cacheKey, $tags, $lifetime);
+
+        // Set headers so the page is cached with the ETag/Last-Modified value for invalidation
         $cacheControl = sprintf(Mage::getStoreConfig('system/diehard/cachecontrol'), $lifetime);
         $response->setHeader('Cache-Control', $cacheControl, true);
-        $response->setHeader('ETag', 'W/"'.$etag.'"', true);
+        // TODO - Set Expires?
+        if($useEtags) {
+            $response->setHeader('ETag', 'W/"'.$cacheData.'"', true);
+        } else {
+            $response->setHeader('Last-Modified', $cacheData, true);
+        }
     }
 
     /**
@@ -86,17 +94,36 @@ abstract class Cm_Diehard_Model_Backend_Revalidate extends Cm_Diehard_Model_Back
             return FALSE;
         }
 
+        // Use ETags if given
         if(
              ($ifNoneMatch = Mage::app()->getRequest()->getHeader('If-None-Match'))
           && ($etag = Mage::app()->loadCache($this->getCacheKey()))
-          && preg_match_all('#(?:W/)?"(\w+)",?#', $ifNoneMatch, $matches)
-          && in_array($etag, $matches[1])
+          && preg_match('|(?:W/)?"'.$etag.'"|', $ifNoneMatch)
         ) {
             // Client's cached content is valid, we're all done here!
             Mage::app()->getResponse()->setHttpResponseCode(304);
+            Mage::app()->getResponse()->setHeader('ETag', 'W/"'.$etag.'"', true);
             return TRUE;
         }
+
+        // Fall-back to Last-Modified if given
+        if(
+             ($ifModifiedSince = Mage::app()->getRequest()->getHeader('If-Modified-Since'))
+          && ($lastModified = Mage::app()->loadCache($this->getCacheKey()))
+          && $lastModified == $ifModifiedSince
+        ) {
+            // Client's cached content is valid, we're all done here!
+            Mage::app()->getResponse()->setHttpResponseCode(304);
+            Mage::app()->getResponse()->setHeader('Last-Modified', $this->_rfc1123Date(), true);
+            return TRUE;
+        }
+
         return FALSE;
+    }
+
+    protected function _rfc1123Date()
+    {
+        return gmdate('D, d M Y H:i:s', time()).' GMT';
     }
 
 }

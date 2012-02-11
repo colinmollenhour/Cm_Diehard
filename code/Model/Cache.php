@@ -8,7 +8,7 @@ class Cm_Diehard_Model_Cache extends Mage_Core_Model_Cache
      */
     public function flush()
     {
-        if(Mage::helper('diehard')->getBackendType() != 'diehard/magento') {
+        if(Mage::helper('diehard')->getBackendType() != 'diehard/backend_magento') {
             Mage::helper('diehard')->flush();
         }
         return parent::flush();
@@ -20,7 +20,7 @@ class Cm_Diehard_Model_Cache extends Mage_Core_Model_Cache
      */
     public function cleanType($typeCode)
     {
-        if($typeCode == 'diehard' && Mage::helper('diehard')->getBackendType() != 'diehard/magento') {
+        if($typeCode == 'diehard' && Mage::helper('diehard')->getBackendType() != 'diehard/backend_magento') {
             Mage::helper('diehard')->flush();
         }
         return parent::cleanType($typeCode);
