@@ -52,7 +52,7 @@
         <layout>
             <updates>
                 <diehard>
-                    <file>diehard/diehard.xml</file>
+                    <file>diehard.xml</file>
                 </diehard>
             </updates>
         </layout>

@@ -1,5 +1,5 @@
 code/                             app/code/community/Cm/Diehard/
-frontend/layout/diehard/        app/design/frontend/base/default/layout/diehard/
-frontend/template/diehard/      app/design/frontend/base/default/template/diehard/
+frontend/layout/*                 app/design/frontend/base/default/layout/
+frontend/template/                app/design/frontend/base/default/template/diehard/
 js/*                              js/diehard/
 Cm_Diehard.xml                    app/etc/modules/Cm_Diehard.xml
