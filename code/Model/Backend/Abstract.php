@@ -35,17 +35,16 @@ abstract class Cm_Diehard_Model_Backend_Abstract
     public function getCacheKey()
     {
         if( ! $this->_cacheKey) {
-            $cacheKeyInfo = array(
+            $this->_cacheKey = implode('_', array(
                 'DIEHARD',
                 $this->_name,
-                Mage::app()->getStore()->getId(),
+                // Mage::app()->getStore()->getId(), // Can't be used before init
                 Mage::app()->getRequest()->getScheme(),
                 Mage::app()->getRequest()->getHttpHost(FALSE),
                 Mage::app()->getRequest()->getRequestUri(),
+                Mage::app()->getRequest()->getCookie(Cm_Diehard_Helper_Data::COOKIE_CACHE_KEY_DATA, '')
                 // Design?
-            );
-            // TODO - need some method besides events for allowing other modules to add cache key info
-            $this->_cacheKey = implode('_', $cacheKeyInfo);
+            ));
         }
         return $this->_cacheKey;
     }

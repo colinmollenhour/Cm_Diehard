@@ -1178,22 +1178,44 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
         if (is_null($this->getCacheLifetime()) || !Mage::app()->useCache(self::CACHE_GROUP)) {
             return false;
         }
-        Mage::app()->saveCache($data, $this->getCacheKey(), $this->getCacheTags(), $this->getCacheLifetime());
+        Mage::app()->saveCache($data, $this->getCacheKey(), $this->_getCacheTags(), $this->getCacheLifetime());
         return $this;
     }
 
-    /** Additions for Cm_Diehard module */
-    /* TODO - reimplement as event observer? */
+    /*                                                             ^
+     *  Additions for Cm_Diehard module                            |
+     *    Note this change: ---------------------------------------+
+     */
+
+    /**
+     * @param string $htmlId
+     * @return Mage_Core_Block_Abstract
+     */
     public function setBlockIsDynamic($htmlId = '')
     {
-        if(Mage::helper('diehard')->getLifetime()) {
+        if(Mage::helper('diehard_lifetime')) {
             if( ! $htmlId) {
-                $htmlId = 'db_'.preg_replace('/[^a-zA-Z0-9]+/', '_', $this->getNameInLayout());
+                $htmlId = 'dh_'.preg_replace('/[^a-zA-Z0-9]+/', '_', $this->getNameInLayout());
                 $this->setFrameTags('div id="'.$htmlId."'", 'div');
             }
             Mage::helper('diehard')->addDynamicBlock($htmlId, $this->getNameInLayout());
         }
         return parent::setData('block_is_dynamic', TRUE);
+    }
+
+    /**
+     * Add block cache tags to page cache tags so page is invalidated if block is invalidated.
+     *
+     * @return array
+     */
+    protected function _getCacheTags()
+    {
+        $tags = $this->getCacheTags();
+        if(Mage::helper('diehard')->getLifetime()) {
+            // TODO - should we remove self::CACHE_GROUP?
+            Mage::helper('diehard')->addTags($tags);
+        }
+        return $tags;
     }
 
 }

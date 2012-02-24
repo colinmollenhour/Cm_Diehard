@@ -10,14 +10,14 @@ Example:
         <action method="setBlockIsDynamic"></action>
     </reference>
     HTML:
-    <?php if(Mage::registry('diehard') && Mage::registry('diehard')->getLifetime()): ?>
-    Today
+    <?php if( Mage::registry('diehard_lifetime') || ! Mage::helper('customer')->isLoggedIn() ): ?>
+    <p><?php echo $this->__('Welcome!') ?></p>
     <?php else: ?>
-    <?php echo date('r') ?>
+    <p><?php echo $this->__('Welcome back, %s!', Mage::helper('customer')->getCustomerName()) ?>
     <?php endif; ?>
 
-In the above example, the page will load with "Today" and then "Today" will be replaced
-shortly after by the current date.
+In the above example, the page will load with "Welcome!" and then that will be
+replaced shortly after by "Welcome back, Colin Mollenhour!"
 
 In some cases the cached version of the page will only need to be updated under certain circumstances. In this case
 you can add the block to a list of "ignored" blocks and remove it from the list when it needs to become dynamic again.

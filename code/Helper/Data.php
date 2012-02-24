@@ -18,6 +18,8 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     /** Cookie key for list of ignored blocks */
     const COOKIE_IGNORED_BLOCKS = 'diehard_ignored';
 
+    const COOKIE_CACHE_KEY_DATA = 'dh';
+
     protected $_lifetime = FALSE;
 
     protected $_tags = array();
@@ -62,6 +64,10 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function setLifetime($lifetime)
     {
+        Mage::unregister('diehard_lifetime');
+        if($lifetime) {
+            Mage::register('diehard_lifetime', $lifetime);
+        }
         $this->_lifetime = $lifetime;
     }
 
@@ -187,7 +193,7 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     public function getObservedBlocks()
     {
         $blocks = array_values($this->getDynamicBlocks());
-        $ignored = $this->getIgnoredBlocks();
+        $ignored = (array) $this->getIgnoredBlocks();
         $ignored = array_merge($ignored, $this->_addedIgnoredBlocks);
         $ignored = array_diff($ignored, $this->_removedIgnoredBlocks);
         $blocks = array_diff($blocks, $ignored);

@@ -75,7 +75,10 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
         // Experimental: Inject dynamic content replacement at end of body to save an Ajax request
         if( ! $this->useAjax()) {
             $body = $response->getBody('default');
-            $body = str_replace('</body>', $this->getDynamicBlockReplacement().'</body>', $body, 1);
+            $bodyPos = strrpos($body, '</body>');
+            if($bodyPos && ($dynamic = $this->getDynamicBlockReplacement())) {
+              $body = substr_replace($body, $dynamic, $bodyPos, 0);
+            }
             $response->setBody($body, 'default');
         }
     }
@@ -98,19 +101,11 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
      */
     public function extractContent($content)
     {
-        if( ! $this->helper()->isEnabled()) {
-            return FALSE;
-        }
-
         $cacheKey = $this->getCacheKey();
         if(Mage::app()->getCacheInstance()->getFrontend()->test($cacheKey)) {
             $this->setUseCachedResponse(TRUE);
 
-            // Event allows observers to cancel the sending of a cached response
-            // TODO - I don't think events can be used here since they are not yet initialized
-            Mage::dispatchEvent('diehard_use_cached_response', array(
-                'backend' => $this,
-            ));
+            // TODO - allow external code to cancel the sending of a cached response
 
             if($this->getUseCachedResponse()) {
                 return Mage::app()->loadCache($cacheKey);
@@ -143,6 +138,8 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             $request->setActionName('ajax');
             $request->setControllerModule('Cm_Diehard');
             // TODO $request->setParam('full_action_name', ???);
+            // TODO Reset layout
+            // TODO Disable cache and re-enable after render
             $request->setParam('blocks', $dynamicBlocks);
             $response = new Mage_Core_Controller_Response_Http;
             $controller = new Cm_Diehard_LoadController($request, $response);

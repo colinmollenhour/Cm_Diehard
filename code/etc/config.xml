@@ -4,7 +4,7 @@
     <modules>
         <Cm_Diehard>
             <active>true</active>
-            <codePool>local</codePool>
+            <codePool>community</codePool>
             <version>0.0.1</version>
         </Cm_Diehard>
     </modules>
