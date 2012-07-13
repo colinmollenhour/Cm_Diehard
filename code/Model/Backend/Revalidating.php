@@ -3,10 +3,31 @@
  * This backend uses HTTP/1.1 headers to tell the receiver to cache the page, but revalidate the cache.
  * The revalidation is done within Magento to allow for advanced invalidation (e.g. cookies).
  *
- * ETags are used to communicate if the cached content is stale so make sure your proxy
- * respects the ETag value.
+ * ETag or Last-Modified headers are used to communicate if the cached content is stale so make sure
+ * your proxy supports revalidation and choose the proper method. Weak ETags are used since byte-range
+ * requests are not supported. Nginx does not support ETag as of 1.2.
  *
- * Weak ETags are used since byte-range requests are not supported.
+ * Pros:
+ *   - Off-loads storage of cache to remote server.
+ *   - Requires no invalidation on the remote server since every request is revalidated.
+ *   - Can be used with the browser's cache for easy testing.
+ *   - Allows advanced caching decisions.
+ *   - You can use third-party services for your cache frontend and still have instant invalidation.
+ * Cons:
+ *   - Every request will still hit PHP, but the cache hit will be much more efficient than a miss.
+ *
+ * Reverse-proxy servers that support revalidation:
+ *   - Nginx (1.3 supposedly supports ETag)
+ *   - Apache (ETag support buggy, possibly fixed in 2.4)
+ *   - Varnish (Possible ETag support in 2.0.5)
+ *
+ * Third-party services that definitely support revalidation:
+ *   - Cloudfront
+ *
+ * Third-party services that probably support revalidation (unconfirmed):
+ *   - Akamai
+ *   - Limelight
+ *   - EdgeCast
  *
  * To use this backend you must add it to the cache request processors in app/etc/local.xml:
  *
@@ -25,7 +46,7 @@
 abstract class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Backend_Abstract
 {
 
-    protected $_name = 'Proxy';
+    protected $_name = 'Revalidating';
 
     protected $_useAjax = TRUE;
     
@@ -57,16 +78,20 @@ abstract class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Ba
     public function httpResponseSendBefore(Mage_Core_Controller_Response_Http $response, $lifetime)
     {
         $useEtags = Mage::getStoreConfigFlag('system/diehard/use_etags');
-        if($useEtags) {
-            $cacheData = sha1(microtime().mt_rand());
-        } else {
-            $cacheData = $this->_rfc1123Date();
-        }
-
         $cacheKey = $this->getCacheKey();
-        $tags = $this->helper()->getTags();
-        $tags[] = Cm_Diehard_Helper_Data::CACHE_TAG;
-        Mage::app()->saveCache($cacheData, $cacheKey, $tags, $lifetime);
+
+        // Use existing cache data if it exists in case there are multiple upstream proxies
+        // If a record exists then any content generated at the time the record was is assumed to not be stale
+        if ( ! ($cacheData = Mage::app()->loadCache($cacheKey))) {
+            if($useEtags) {
+                $cacheData = sha1(microtime().mt_rand());
+            } else {
+                $cacheData = $this->_rfc1123Date();
+            }
+            $tags = $this->helper()->getTags();
+            $tags[] = Cm_Diehard_Helper_Data::CACHE_TAG;
+            Mage::app()->saveCache($cacheData, $cacheKey, $tags, $lifetime);
+        }
 
         // Set headers so the page is cached with the ETag/Last-Modified value for invalidation
         $cacheControl = sprintf(Mage::getStoreConfig('system/diehard/cachecontrol'), $lifetime);
@@ -82,8 +107,8 @@ abstract class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Ba
     /**
      * This method is called by Mage_Core_Model_Cache->processRequest()
      *
-     * If the request is a revalidate request (If-None-Match) then compare the value with the cached
-     * ETag value and either reply 304 Not Modified or 200 (with rendered page).
+     * If the request is a revalidate request (If-None-Match or If-Modified-Since) then compare the
+     * value with the cached value and either reply 304 Not Modified or 200 (with rendered page).
      *
      * @param  string|bool $content
      * @return bool
