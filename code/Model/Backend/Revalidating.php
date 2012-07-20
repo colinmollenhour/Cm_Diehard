@@ -17,7 +17,7 @@
  *   - Every request will still hit PHP, but the cache hit will be much more efficient than a miss.
  *
  * Reverse-proxy servers that support revalidation:
- *   - Nginx (1.3 supposedly supports ETag)
+ *   - Nginx (No ETag support)
  *   - Apache (ETag support buggy, possibly fixed in 2.4)
  *   - Varnish (Possible ETag support in 2.0.5)
  *
