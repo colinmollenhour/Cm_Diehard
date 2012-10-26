@@ -30,7 +30,10 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
 
     protected $_name = 'Magento';
 
+    /* Supported methods: */
     protected $_useAjax = TRUE;
+    protected $_useEsi  = TRUE;
+    protected $_useJs   = TRUE;
 
     protected $_useCachedResponse = NULL;
 
@@ -72,22 +75,28 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             Mage::app()->saveCache($response->getBody(), $cacheKey, $tags, $lifetime);
         }
 
-        // Experimental: Inject dynamic content replacement at end of body to save an Ajax request
-        if( ! $this->useAjax()) {
-            $body = $response->getBody('default');
-            $bodyPos = strrpos($body, '</body>');
-            if($bodyPos && ($dynamic = $this->getDynamicBlockReplacement())) {
-              $body = substr_replace($body, $dynamic, $bodyPos, 0);
-            }
+        // Inject dynamic content replacement at end of body
+        $body = $response->getBody('default');
+        if ($this->useJs()) {
+            $body = $this->injectDynamicBlocks($body);
             $response->setBody($body, 'default');
         }
     }
 
+    /**
+     * Observers of the `diehard_use_cached_response` event may use this to disallow sending of
+     * a cached response for any given request.
+     *
+     * @param bool $flag
+     */
     public function setUseCachedResponse($flag)
     {
         $this->_useCachedResponse = $flag;
     }
 
+    /**
+     * @return bool
+     */
     public function getUseCachedResponse()
     {
         return $this->_useCachedResponse;
@@ -105,46 +114,86 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
         if(Mage::app()->getCacheInstance()->getFrontend()->test($cacheKey)) {
             $this->setUseCachedResponse(TRUE);
 
-            // TODO - allow external code to cancel the sending of a cached response
+            // Allow external code to cancel the sending of a cached response
+            if (0 /* TODO optional events_enabled feature */) {
+                Mage::app()->loadAreaPart(Mage_Core_Model_App_Area::AREA_FRONTEND, Mage_Core_Model_App_Area::PART_CONFIG);
+                Mage::app()->loadAreaPart(Mage_Core_Model_App_Area::AREA_FRONTEND, Mage_Core_Model_App_Area::PART_EVENTS);
+                Mage::dispatchEvent('diehard_use_cached_response', array('backend' => $this));
+            }
 
             if($this->getUseCachedResponse()) {
-                return Mage::app()->loadCache($cacheKey);
+                $body = Mage::app()->loadCache($cacheKey);
+                // Inject dynamic content replacement at end of body
+                $body = $this->injectDynamicBlocks($body);
+                return $body;
             }
         }
         return FALSE;
     }
 
     /**
-     * Incomplete and untested.
-     *
+     * @param $body
      * @return string
      */
-    public function getDynamicBlockReplacement()
+    public function injectDynamicBlocks($body)
+    {
+        if ($params = $this->extractParamsFromBody($body)) {
+            $dynamic = $this->getDynamicBlockReplacement($params);
+            $_body = $this->replaceParamsInBody($body, $dynamic);
+            if ($_body) {
+                return $_body;
+            }
+        }
+        return $body;
+    }
+
+    /**
+     * Calls the diehard/load controller without spawning a new request
+     *
+     * @param array $params
+     * @return string
+     */
+    public function getDynamicBlockReplacement($params)
     {
         // Append dynamic block content to end of page to be replaced by javascript, but not Ajax
-        if($dynamicBlocks = $this->helper()->getObservedBlocks()) {
-            // Init store if it has not been inited yet (page served from cache)
-            if( ! Mage::app()->getFrontController()->getAction()) {
-                $scopeCode = ''; // TODO
-                $scopeType = 'store'; // TODO
-
-                Mage::app()->init($scopeCode, $scopeType);
+        if($params['blocks'] || ! empty($params['all_blocks']))
+        {
+            // Init store if it has not been yet (page served from cache)
+            if( ! Mage::app()->getFrontController()->getData('action')) {
+                $appParams = Mage::registry('application_params');
+                Mage::app()->init($appParams['scope_code'], $appParams['scope_type'], $appParams['options']);
+            }
+            // Reset parts of app if it has been init'ed (page not served from cache but being saved to cache)
+            else {
+                // Reset layout
+                Mage::unregister('_singleton/core/layout');
+                Mage::getSingleton('core/layout');
+                // TODO Mage::app()->getLayout() is not reset using the method above!
+                // TODO Consider resetting Magento entirely using Mage::reset();
             }
 
-            // Create a subrequest
-            $request = new Mage_Core_Controller_Request_Http('_diehard/load/ajax');
+            // Create a subrequest to get JSON response
+            $request = new Mage_Core_Controller_Request_Http('_diehard/load/json');
             $request->setModuleName('_diehard');
             $request->setControllerName('load');
             $request->setActionName('ajax');
             $request->setControllerModule('Cm_Diehard');
-            // TODO $request->setParam('full_action_name', ???);
-            // TODO Reset layout
-            // TODO Disable cache and re-enable after render
-            $request->setParam('blocks', $dynamicBlocks);
+            $request->setParam('full_action_name', $params['full_action_name']);
+            if ( ! empty($params['all_blocks'])) {
+                $request->setParam('all_blocks', 1);
+            } else {
+                $request->setParam('blocks', $params['blocks']);
+            }
+            $request->setParam('params', $params['params']);
             $response = new Mage_Core_Controller_Response_Http;
             $controller = new Cm_Diehard_LoadController($request, $response);
+
+            // Disable cache, render replacement blocks and re-enable
+            $oldLifetime = $this->helper()->getLifetime();
+            $this->helper()->setLifetime(FALSE);
             $controller->preDispatch();
-            $controller->dispatch('ajax');
+            $controller->dispatch('json');
+            $this->helper()->setLifetime($oldLifetime);
 
             return "<script type=\"text/javascript\">Diehard.replaceBlocks({$response->getBody()});</script>";
         }

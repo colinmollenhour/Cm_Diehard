@@ -10,21 +10,26 @@ class Cm_Diehard_LoadController extends Mage_Core_Controller_Front_Action
 {
 
     /**
-     * Index action. This action is called by an ajax request
+     * Get an object with all of the block contents
+     *
+     * @return array
      */
-    public function ajaxAction() {
-
-        // if (!$this->getRequest()->isXmlHttpRequest()) { Mage::throwException('This is not an XmlHttpRequest'); }
-
+    protected function _getResponseObject()
+    {
         $response = array(
             'blocks' => array(),
             'ignoreBlocks' => array(),
         );
 
-        // Translate JSON to params if using Prototype
-        if($params = $this->getRequest()->getParam('json')) {
-          $params = json_decode($params, TRUE);
-          $this->getRequest()->setParams($params);
+        // Translate JSON params to top-level params
+        if ($params = $this->getRequest()->getParam('json')) {
+            $params = json_decode($params, TRUE);
+            $this->getRequest()->setParams($params);
+        }
+
+        // Translate "params" to top-level params
+        if ($params = $this->getRequest()->getParam('params')) {
+            $this->getRequest()->setParams($params);
         }
 
         // Add handles to layout
@@ -36,19 +41,60 @@ class Cm_Diehard_LoadController extends Mage_Core_Controller_Front_Action
         $this->loadLayout($handles);
         $layout = $this->getLayout();
 
-        // Render block content
-        $requestedBlockNames = $this->getRequest()->getParam('blocks', array());
-        foreach ($requestedBlockNames as $id => $requestedBlockName) {
-            $tmpBlock = $layout->getBlock($requestedBlockName);
-            if ($tmpBlock) {
-                $response['blocks'][$id] = $tmpBlock->toHtml();
-            } else {
-                $response['blocks'][$id] = '<!-- BLOCK NOT FOUND -->';
+        // Render all blocks contents
+        if ($this->getRequest()->getParam('all_blocks')) {
+            foreach ($this->getLayout()->getAllBlocks() as $blockName => $block) {
+                $htmlId = $block->getData('diehard_html_id');
+                if ( ! $htmlId) {
+
+                }
+              // TODO - OR assume usage of a standard convention like "dh:<name_in_layout>"
             }
         }
 
-        // Send JSON response
+        // When using Ajax the client can specify a subset of available blocks
+        else {
+            $requestedBlockNames = $this->getRequest()->getParam('blocks', array());
+            foreach ($requestedBlockNames as $id => $requestedBlockName) {
+                $tmpBlock = $layout->getBlock($requestedBlockName);
+                if ($tmpBlock) {
+                    $response['blocks'][$id] = $tmpBlock->toHtml();
+                } else {
+                    $response['blocks'][$id] = '<!-- BLOCK NOT FOUND -->';
+                }
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * Send the response as a JSON object
+     */
+    public function jsonAction()
+    {
+        $response = $this->_getResponseObject();
         $this->getResponse()->setBody(Zend_Json::encode($response));
+    }
+
+    /**
+     * Send the response as JSONP (JSON wrapped in a callback, safe for Cross-Domain requests)
+     */
+    public function jsonpAction()
+    {
+        $response = $this->_getResponseObject();
+        $this->getResponse()->setBody('Diehard.replaceBlocks('.Zend_Json::encode($response).');');
+    }
+
+    /**
+     * Send the response in a format suitable for ESI injection.
+     */
+    public function esiAction()
+    {
+        $response = $this->_getResponseObject();
+        $this->getResponse()->setBody(
+            '<script type="text/javascript">Diehard.replaceBlocks('.Zend_Json::encode($response).');</script>'
+        );
     }
 
 }

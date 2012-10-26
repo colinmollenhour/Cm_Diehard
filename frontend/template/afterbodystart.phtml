@@ -1,9 +1,0 @@
-<?php /* @var $this Cm_Diehard_Block_Afterbodystart */ ?>
-<?php if(Mage::registry('diehard') && Mage::registry('diehard')->useAjax()): ?>
-<script type="text/javascript">
-    var diehard = new Diehard('<?php echo $this->getLoadAjaxUrl() ?>', '<?php echo $this->getAction()->getFullActionName() ?>');
-    <?php if ($_product = Mage::registry('product')) : ?>
-    diehard.setParam('product_id', <?php echo (int) $_product->getId() ?>);
-    <?php endif; ?>
-</script>
-<?php endif; ?>

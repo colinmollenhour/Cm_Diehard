@@ -6,14 +6,9 @@
             <action method="addJs" ifconfig="system/diehard/usejs"><script helper="diehard/getJsLib" /></action>
         </reference>
 
-        <!-- Initialize javascript object and dom:loaded event -->
-        <reference name="after_body_start">
-            <block type="diehard/afterbodystart" name="diehard_start" template="diehard/afterbodystart.phtml" />
-        </reference>
-
-        <!-- Add all dynamic blocks before ajax request -->
+        <!-- After all dynamic blocks are rendered, render block which aides in dynamic block replacement -->
         <reference name="before_body_end">
-            <block type="diehard/beforebodyend" name="diehard_end" template="diehard/beforebodyend.phtml"></block>
+            <block type="diehard/beforebodyend" name="diehard_end" template="diehard/beforebodyend.phtml" after="-"></block>
         </reference>
 
     </default>

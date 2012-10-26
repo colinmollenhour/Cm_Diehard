@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Data helper
  *
@@ -29,6 +28,8 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     protected $_addedIgnoredBlocks = array();
 
     protected $_removedIgnoredBlocks = array();
+
+    protected $_params = array();
 
     /**
      * @return bool
@@ -208,10 +209,34 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Get all dynamic params that were set
+     *
+     * @return array
+     */
+    public function getDynamicParams()
+    {
+        return $this->_params;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return Cm_Diehard_Helper_Data
+     */
+    public function setParam($key, $value)
+    {
+        if ($value instanceof Varien_Object) {
+            $value = $value->getData();
+        }
+        $this->_params[$key] = $value;
+        return $this;
+    }
+
+    /**
      * Check if a fullActionName is configured as cacheable
      *
      * @param string $fullActionName
-     * @return false|int false if not cacheable, otherwise lifetime in seconds
+     * @return bool|int false if not cacheable, otherwise lifetime in seconds
      */
     public function isCacheableAction($fullActionName)
     {
@@ -262,6 +287,22 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     public function useAjax()
     {
         return $this->getBackend()->useAjax() && $this->getJsLib();
+    }
+
+    /**
+     * @return bool
+     */
+    public function useEsi()
+    {
+        return $this->getBackend()->useEsi() && $this->getJsLib();
+    }
+
+    /**
+     * @return bool
+     */
+    public function useJs()
+    {
+        return $this->getBackend()->useJs() && $this->getJsLib();
     }
 
     /**

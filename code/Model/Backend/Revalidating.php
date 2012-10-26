@@ -17,9 +17,11 @@
  *   - Every request will still hit PHP, but the cache hit will be much more efficient than a miss.
  *
  * Reverse-proxy servers that support revalidation:
+ *   - Squid (ETag w/ Vary supported)
  *   - Nginx (No ETag support)
  *   - Apache (ETag support buggy, possibly fixed in 2.4)
  *   - Varnish (Possible ETag support in 2.0.5)
+ *   - Apache TrafficServer (ETag supported, unknown to what degree)
  *
  * Third-party services that definitely support revalidation:
  *   - Cloudfront
@@ -43,13 +45,16 @@
  * @package     Cm_Diehard
  * @author      Colin Mollenhour
  */
-abstract class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Backend_Abstract
+class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Backend_Abstract
 {
 
     protected $_name = 'Revalidating';
 
+    /* Supported methods: */
     protected $_useAjax = TRUE;
-    
+    protected $_useEsi  = TRUE;
+    protected $_useJs   = FALSE;
+
     /**
      * Clear all cached pages (clears etags)
      *
@@ -115,10 +120,6 @@ abstract class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Ba
      */
     public function extractContent($content)
     {
-        if( ! $this->helper()->isEnabled()) {
-            return FALSE;
-        }
-
         // Use ETags if given
         if(
              ($ifNoneMatch = Mage::app()->getRequest()->getHeader('If-None-Match'))

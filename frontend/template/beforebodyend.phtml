@@ -1,11 +1,15 @@
 <?php /* @var $this Cm_Diehard_Block_Beforebodyend */ ?>
-<?php $helper = Mage::registry('diehard'); /* @var $helper Cm_Diehard_Helper_Data */ ?>
-<?php if($helper && $helper->useAjax()): ?>
+<?php if ( ! $this->diehard()) return; ?>
+<?php if ($this->diehard()->useAjax()): ?>
 <script type="text/javascript">
 //<![CDATA[
-    <?php foreach($helper->getDynamicBlocks() as $htmlId => $nameInLayout): ?>
-    diehard.addBlock('<?php echo $htmlId ?>', '<?php echo $nameInLayout ?>');
-    <?php endforeach; ?>
+    var diehard = new Diehard('<?php echo $this->getLoadAjaxUrl() ?>', '<?php echo $this->getAction()->getFullActionName() ?>');
+    diehard.setParams(<?php echo json_encode($this->diehard()->getDynamicParams()) ?>);
+    diehard.setBlocks(<?php echo json_encode($this->diehard()->getDynamicBlocks()) ?>);
 //]]>
 </script>
+<?php elseif ($this->diehard()->useEsi()): ?>
+<!--esi <esi:include src="<?php echo $this->getLoadEsiUrl() ?>" /> -->
+<?php elseif ($this->diehard()->useJs()): /* Used for direct inline replacement */ ?>
+<!-- ###DIEHARD:<?php echo json_encode($this->getDynamicParamsCombined()) ?>### -->
 <?php endif; ?>

@@ -15,8 +15,11 @@ class Cm_Diehard_Model_Backend_Proxy extends Cm_Diehard_Model_Backend_Abstract
 
     protected $_name = 'Proxy';
 
+    /* Supported methods: */
     protected $_useAjax = TRUE;
-    
+    protected $_useEsi  = TRUE;
+    protected $_useJs   = FALSE;
+
     /**
      * Clean all urls.
      */

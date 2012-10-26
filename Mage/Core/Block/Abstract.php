@@ -741,6 +741,18 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
         if (Mage::getStoreConfig('advanced/modules_disable_output/'.$this->getModuleName())) {
             return '';
         }
+
+        /* START: Added by Cm_Diehard */
+        // if setBlockIsDynamic and setSuppressOutput then we automatically render only a placeholder tag.
+        if ($this->getData('block_is_dynamic') && Mage::registry('diehard_lifetime') && $this->getData('suppress_output')) {
+            $html = '';
+            if ($this->_frameOpenTag) {
+                $html = '<'.$this->_frameOpenTag.'>'.$html.'<'.$this->_frameCloseTag.'>';
+            }
+            return $html;
+        }
+        /* END: Added by Cm_Diehard */
+
         $html = $this->_loadCache();
         if (!$html) {
             $translate = Mage::getSingleton('core/translate');
@@ -1185,6 +1197,7 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
     /*                                                             ^
      *  Additions for Cm_Diehard module                            |
      *    Note this change: ---------------------------------------+
+     *    Also note change to toHtml() method.
      */
 
     /**
@@ -1193,14 +1206,31 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
      */
     public function setBlockIsDynamic($htmlId = '')
     {
-        if(Mage::helper('diehard_lifetime')) {
-            if( ! $htmlId) {
-                $htmlId = 'dh_'.preg_replace('/[^a-zA-Z0-9]+/', '_', $this->getNameInLayout());
+        // Generic rendering mode
+        if (Mage::registry('diehard_lifetime')) {
+            if ( ! $htmlId) {
+                $htmlId = $this->getDiehardHtmlId();
                 $this->setFrameTags('div id="'.$htmlId."'", 'div');
             }
             Mage::helper('diehard')->addDynamicBlock($htmlId, $this->getNameInLayout());
         }
-        return parent::setData('block_is_dynamic', TRUE);
+        // Specific rendering mode
+        else {
+            $this->setData('diehard_html_id', $htmlId ? $htmlId : $this->getDiehardHtmlId());
+        }
+        return $this->setData('block_is_dynamic', TRUE);
+    }
+
+    /**
+     * Get or generate an html id for the replacement block
+     * @return mixed|string
+     */
+    public function getDiehardHtmlId()
+    {
+        if ( ! $this->hasData('diehard_html_id')) {
+            return 'dh:'.preg_replace('/[^a-zA-Z0-9]+/', '_', $this->getNameInLayout());
+        }
+        return $this->getData('diehard_html_id');
     }
 
     /**

@@ -135,10 +135,12 @@
                 <label>Prototype (default)</label>
                 <path>diehard/fpc-prototype.js</path>
             </prototype>
+            <!-- Not currently implemented
             <jquery>
                 <label>jQuery</label>
                 <path>diehard/fpc-jquery.js</path>
             </jquery>
+            -->
         </jslibs>
 
         <!-- Blocks that are ignored for fresh sessions (ignored by default) -->
@@ -153,7 +155,6 @@
             <diehard>
                 <usejs>1</usejs>
                 <jslib>diehard/fpc-prototype.js</jslib>
-                <cache_control>public, must-revalidate, s-maxage=%d</cache_control>
             </diehard>
         </system>
         <dev>

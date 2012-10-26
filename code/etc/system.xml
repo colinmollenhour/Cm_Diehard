@@ -39,6 +39,17 @@
                             <show_in_store>1</show_in_store>
                             <depends><usejs>1</usejs></depends>
                         </jslib>
+                        <injection translate="label comment">
+                            <label>Dynamic Block Injection</label>
+                            <comment><![CDATA[Choose how dynamic blocks are injected. Not all methods are supported by all backends.]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>diehard/system_config_injection</source_model>
+                            <sort_order>111</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><usejs>1</usejs></depends>
+                        </injection>
                         <backend translate="label comment">
                             <label>Cache Backend</label>
                             <comment><![CDATA[Choose a backend driver for the cache (handles caching response and purging cache).]]></comment>
@@ -51,7 +62,7 @@
                         </backend>
                         <cachecontrol translate="label comment">
                             <label>Cache-Control Header</label>
-                            <comment><![CDATA[Choose how the content can be cached.]]></comment>
+                            <comment><![CDATA[Choose how the content can be cached. Applies only to Proxy and Revalidating backends.]]></comment>
                             <frontend_type>select</frontend_type>
                             <source_model>diehard/system_config_cachecontrol</source_model>
                             <sort_order>130</sort_order>

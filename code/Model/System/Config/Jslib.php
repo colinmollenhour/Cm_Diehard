@@ -1,6 +1,6 @@
 <?php
-
 /**
+ * List available javascript libraries
  *
  * @author Colin Mollenhour
  */

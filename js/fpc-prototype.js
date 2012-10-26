@@ -9,20 +9,15 @@ Diehard.prototype =
         document.observe('dom:loaded', this.loadDynamicContent.bind(this));
     },
 
-    setParam: function(key, value) {
-        this.params[key] = value;
+    setParams: function(params) {
+        this.params = params;
     },
 
-    addBlock: function(htmlId, nameInLayout) {
-        this.blocks[htmlId] = nameInLayout;
+    setBlocks: function(blocks) {
+        this.blocks = blocks;
     },
 
     loadDynamicContent: function() {
-        // Add blocks based on class name
-        $$('.placeholder').each(function(el) {
-          this.addBlock(el.id, el.readAttribute('rel'));
-        }.bind(this));
-
         // Remove ignored blocks
         var ignored = Mage.Cookie.get('diehard_ignored').split(',');
         this.blocks = $H(this.blocks).inject({}, function(acc, pair){
@@ -34,13 +29,17 @@ Diehard.prototype =
 
         // Fetch dynamic content
         if($H(this.blocks).keys().length) {
-            this.params['blocks'] = this.blocks;
+            var params = {
+                full_action_name: this.action,
+                blocks: this.blocks,
+                params: this.params
+            };
             new Ajax.Request(this.url, {
-                parameters: {json: Object.toJSON(this.params)},
+                parameters: {json: Object.toJSON(params)},
                 evalJSON: 'force',
                 onSuccess: function(response) {
                     Diehard.replaceBlocks(response.responseJSON);
-                }.bind(this)
+                }
             });
         }
     }
