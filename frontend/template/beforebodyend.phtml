@@ -1,5 +1,5 @@
 <?php /* @var $this Cm_Diehard_Block_Beforebodyend */ ?>
-<?php if ( ! $this->diehard()) return; ?>
+<?php if ( ! $this->diehard() || ! $this->diehard()->getDynamicBlocks()) return; ?>
 <?php if ($this->diehard()->useAjax()): ?>
 <script type="text/javascript">
 //<![CDATA[
