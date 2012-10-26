@@ -1,9 +1,9 @@
-# Cm_Diehard: Full-Page Cache with Ajax block loading. #
+# Cm_Diehard: Full-Page Cache  #
 
 This module aims to make it easy to serve up cacheable HTML pages without falling back to
 fully-dynamic pages as soon as the visitor takes an individualized action like adding a product
-to their cart. It has several cache backend models to choose from which have different features like
-dynamic block replacement via Ajax or non-Ajax javascript. This hole-punching is only performed as-needed
+to their cart. It has several cache backend models to choose from and supports dynamic block
+replacement via Ajax, ESI or non-Ajax Javascript. This hole-punching is only performed as-needed
 by using a cookie to keep track of which blocks (if any) need to be dynamic. The backends also differ
 in the way that cache invalidation is handled by using some interesting techniques; some of which
 allow for _real-time_ cache invalidation even with a caching reverse proxy! The rendering technique allows
