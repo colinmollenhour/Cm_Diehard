@@ -1,0 +1,15 @@
+{
+    "name":"colinmollenhour/die-hard",
+    "type":"magento-module",
+    "license":"OSL-3.0",
+    "homepage":"https://github.com/colinmollenhour/Cm_DieHard",
+    "description":"Cm_Diehard: Full-Page Cache",
+    "authors":[
+        {
+            "name":"Colin Mollenhour"
+        }
+    ],
+    "require":{
+        "magento-hackathon/magento-composer-installer":"dev-master"
+    }
+}
