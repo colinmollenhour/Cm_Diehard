@@ -43,24 +43,21 @@ class Cm_Diehard_LoadController extends Mage_Core_Controller_Front_Action
 
         // Render all blocks contents
         if ($this->getRequest()->getParam('all_blocks')) {
-            foreach ($this->getLayout()->getAllBlocks() as $blockName => $block) {
-                $htmlId = $block->getData('diehard_html_id');
-                if ( ! $htmlId) {
-
-                }
-              // TODO - OR assume usage of a standard convention like "dh:<name_in_layout>"
+            foreach ($this->getLayout()->getAllBlocks() as $block) { /* @var $block Mage_Core_Block_Abstract */
+                $htmlId = $block->getDiehardHtmlId();
+                $response['blocks'][$htmlId] = $block->toHtml();
             }
         }
 
         // When using Ajax the client can specify a subset of available blocks
         else {
             $requestedBlockNames = $this->getRequest()->getParam('blocks', array());
-            foreach ($requestedBlockNames as $id => $requestedBlockName) {
+            foreach ($requestedBlockNames as $htmlId => $requestedBlockName) {
                 $tmpBlock = $layout->getBlock($requestedBlockName);
                 if ($tmpBlock) {
-                    $response['blocks'][$id] = $tmpBlock->toHtml();
+                    $response['blocks'][$htmlId] = $tmpBlock->toHtml();
                 } else {
-                    $response['blocks'][$id] = '<!-- BLOCK NOT FOUND -->';
+                    $response['blocks'][$htmlId] = '<!-- BLOCK NOT FOUND -->';
                 }
             }
         }
