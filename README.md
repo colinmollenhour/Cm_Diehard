@@ -43,6 +43,46 @@ lightweight in the case of a cache hit. This makes it easy to use a caching reve
 explicitly invalidating large numbers of cached pages on a potentially large numbers of edge servers. Safely use a CDN for
 your html and still enjoy real-time invalidation! Ajax and ESI hole-punching are supported.
 
+## Enabling Cache
+
+By default no caching is enabled by Cm_Diehard. There are three methods of enabling caching but in
+all cases it is recommended to implement your caching scheme in a separate module from Cm_Diehard.
+A falsey value (0, null, false, '') for the cache lifetime disables caching for the current page.
+
+### config.xml
+
+Set the lifetime in seconds based on the full action name:
+
+    <config>
+        <diehard>
+            <actions>
+                <cms_index_index>86400</cms_index_index>
+                <cms_page_view>86400</cms_page_view>
+            </actions>
+        </diehard>
+    </config>
+
+### Layout updates
+
+Every block inherits a new method named "setDiehardCacheLifetime" which takes the desired lifetime
+in seconds. Layout updates will override the values in config.xml.
+
+    <layout>
+        <cms_page_view>
+            <reference name="root">
+                <action method="setDiehardCacheLifetime"><int>300</int></action>
+            </reference>
+        </cms_page_view>
+    </layout>
+
+### Event observers, controllers, blocks, etc..
+
+In any code before the `http_response_send_before` event is dispatched, you can set the lifetime
+using the 'diehard' helper. The helper is added to the Magento registry with the key 'diehard' so
+that you can easily make your code not dependent on Cm_Diehard.
+
+    Mage::registry('diehard') && Mage::helper('diehard')->setLifetime(300);
+
 ## Example Dynamic Block Injection
 
     LAYOUT:
@@ -78,8 +118,8 @@ In this case you can add the block to a list of "ignored" blocks and remove it f
 needs to become dynamic again.
 
     CONTROLLER or BLOCK prepareLayout:
-    if(Mage::registry('diehard'))
-        if($this->getSession()->getSomeVariable()) {
+    if (Mage::registry('diehard_lifetime'))
+        if ($this->getSession()->getSomeVariable()) {
             Mage::registry('diehard')->addIgnoredBlock($this);
         } else {
             Mage::registry('diehard')->removeIgnoredBlock($this);

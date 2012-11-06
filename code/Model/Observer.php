@@ -20,10 +20,10 @@ class Cm_Diehard_Model_Observer
      *
      * @param Varien_Event_Observer $observer
      */
-    public function processPreDispatch(Varien_Event_Observer $observer)
+    public function controllerActionPredispatch(Varien_Event_Observer $observer)
     {
+        Mage::register('diehard', $this->helper());
         if($this->helper()->isEnabled() && Mage::app()->getRequest()->isGet()) {
-            Mage::register('diehard', $this->helper());
 
             $fullActionName = $observer->getControllerAction()->getFullActionName();
 
@@ -49,9 +49,9 @@ class Cm_Diehard_Model_Observer
     public function httpResponseSendBefore(Varien_Event_Observer $observer)
     {
         if($this->helper()->isEnabled()) {
-            $fullActionName = $observer->getControllerAction()->getFullActionName();
+            $response = $observer->getResponse(); /* @var $response Mage_Core_Controller_Response_Http */
+            $request = Mage::app()->getRequest();
             $lifetime = $this->helper()->getLifetime();
-            $response = $observer->getControllerAction()->getResponse(); /* @var $response Mage_Core_Controller_Response_Http */
 
             if($lifetime) {
                 // Allow backend to take action on responses that are to be cached
@@ -68,6 +68,7 @@ class Cm_Diehard_Model_Observer
 
             // Add debug data
             if($this->helper()->isDebug()) {
+                $fullActionName = $request->getModuleName().'_'.$request->getControllerName().'_'.$request->getActionName();
                 $response->setHeader('X-Diehard', "$fullActionName-$lifetime", true);
                 $response->setHeader('X-Diehard-Tags', implode('|', $this->helper()->getTags()), true);
                 $response->setHeader('X-Diehard-AddedIgnoredBlocks', implode('|',$addedIgnored), true);
@@ -102,7 +103,7 @@ class Cm_Diehard_Model_Observer
      */
     public function modelLoadAfter(Varien_Event_Observer $observer)
     {
-        if($this->helper()->getLifetime() && ($tags = $observer->getObject()->getCacheTags())) {
+        if($this->helper()->getLifetime() && ($tags = $observer->getObject()->getCacheIdTags())) {
             // add tags to list of tags for this page
             $this->helper()->addTags($tags);
         }

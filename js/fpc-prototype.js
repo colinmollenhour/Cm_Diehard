@@ -35,6 +35,7 @@ Diehard.prototype =
                 params: this.params
             };
             new Ajax.Request(this.url, {
+                method: 'get',
                 parameters: {json: Object.toJSON(params)},
                 evalJSON: 'force',
                 onSuccess: function(response) {

@@ -101,7 +101,7 @@ class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Backend_Abs
         // Set headers so the page is cached with the ETag/Last-Modified value for invalidation
         $cacheControl = sprintf(Mage::getStoreConfig('system/diehard/cachecontrol'), $lifetime);
         $response->setHeader('Cache-Control', $cacheControl, true);
-        // TODO - Set Expires?
+        $response->setHeader('Expires', $this->_rfc1123Date(time() + $lifetime), true);
         if($useEtags) {
             $response->setHeader('ETag', 'W/"'.$cacheData.'"', true);
         } else {
@@ -147,9 +147,16 @@ class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Backend_Abs
         return FALSE;
     }
 
-    protected function _rfc1123Date()
+    /**
+     * @param null|int $time
+     * @return string
+     */
+    protected function _rfc1123Date($time = NULL)
     {
-        return gmdate('D, d M Y H:i:s', time()).' GMT';
+        if ($time === NULL) {
+            $time = time();
+        }
+        return gmdate('D, d M Y H:i:s', $time).' GMT';
     }
 
 }

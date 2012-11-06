@@ -1212,7 +1212,8 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
                 $htmlId = $this->getDiehardHtmlId();
                 $this->setFrameTags('div id="'.$htmlId."'", 'div');
             }
-            Mage::helper('diehard')->addDynamicBlock($htmlId, $this->getNameInLayout());
+            $helper = Mage::helper('diehard'); /* @var $helper Cm_Diehard_Helper_Data */
+            $helper->addDynamicBlock($htmlId, $this->getNameInLayout());
         }
         // Specific rendering mode
         else {
@@ -1246,6 +1247,33 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
             Mage::helper('diehard')->addTags($tags);
         }
         return $tags;
+    }
+
+    /**
+     * Convenient method of manipulating cache for the current page via layout updates.
+     */
+    public function setDiehardCacheLifetime($lifetime = FALSE)
+    {
+        $helper = Mage::helper('diehard'); /* @var $helper Cm_Diehard_Helper_Data */
+        $helper->setLifetime($lifetime);
+    }
+
+    /**
+     * @param null|string|array $block
+     */
+    public function addDefaultIgnoredBlock($block = NULL)
+    {
+        $helper = Mage::helper('diehard'); /* @var $helper Cm_Diehard_Helper_Data */
+        if ($block === NULL) {
+            $block = $this;
+        }
+        if (is_array($block)) {
+            foreach ($block as $_block) {
+                $helper->addIgnoredBlock($_block);
+            }
+        } else {
+            $helper->addIgnoredBlock($block);
+        }
     }
 
 }

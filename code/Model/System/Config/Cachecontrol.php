@@ -19,7 +19,11 @@ class Cm_Diehard_Model_System_Config_Cachecontrol {
             ),
             array(
                 'label' => Mage::helper('diehard')->__('Client-side cache allowed'),
-                'value' => 'max-age=%d',
+                'value' => 'private, max-age=%d',
+            ),
+            array(
+                'label' => Mage::helper('diehard')->__('Client-side cache allowed, must-revalidate'),
+                'value' => 'private, must-revalidate, max-age=%d',
             ),
         );
     }

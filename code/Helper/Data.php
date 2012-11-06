@@ -66,7 +66,7 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     public function setLifetime($lifetime)
     {
         Mage::unregister('diehard_lifetime');
-        if($lifetime) {
+        if($lifetime = (int)$lifetime) {
             Mage::register('diehard_lifetime', $lifetime);
         }
         $this->_lifetime = $lifetime;
@@ -111,27 +111,27 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * @param string $block
+     * @param string|Mage_Core_Block_Abstract $block
      * @return void
      */
     public function addIgnoredBlock($block)
     {
-        if($block instanceof Mage_Core_Block_Abstract) {
+        if ($block instanceof Mage_Core_Block_Abstract) {
             $block = $block->getNameInLayout();
         }
         $this->_addedIgnoredBlocks[] = $block;
     }
 
     /**
-     * @param string $block
+     * @param string|Mage_Core_Block_Abstract $block
      * @return void
      */
     public function removeIgnoredBlock($block)
     {
-        if($block instanceof Mage_Core_Block_Abstract) {
+        if ($block instanceof Mage_Core_Block_Abstract) {
             $block = $block->getNameInLayout();
         }
-        $this->_removeIgnoredBlocks[] = $block;
+        $this->_removedIgnoredBlocks[] = $block;
     }
 
     /**

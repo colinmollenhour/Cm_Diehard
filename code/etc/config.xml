@@ -70,7 +70,7 @@
                     <diehard>
                         <type>singleton</type>
                         <class>diehard/observer</class>
-                        <method>processPreDispatch</method>
+                        <method>controllerActionPredispatch</method>
                     </diehard>
                 </observers>
             </controller_action_predispatch>
@@ -87,6 +87,7 @@
             </http_response_send_before>
 
             <!-- Collect all loaded cache tags to associate with page -->
+            <!-- DISABLED
             <model_load_after>
                 <observers>
                     <diehard>
@@ -96,6 +97,7 @@
                     </diehard>
                 </observers>
             </model_load_after>
+            -->
         </events>
     </frontend>
 
@@ -103,10 +105,9 @@
 
         <!-- Cacheable actions and their lifetimes -->
         <actions>
-            <cms_index_index>86400</cms_index_index>
-            <cms_page_view>86400</cms_page_view>
+            <!-- Example:
             <catalog_product_view>86400</catalog_product_view>
-            <catalog_category_view>86400</catalog_category_view>
+            -->
         </actions>
 
         <!-- List of available cache backend models -->
@@ -143,10 +144,11 @@
             -->
         </jslibs>
 
-        <!-- Blocks that are ignored for fresh sessions (ignored by default) -->
+        <!-- Dynamic blocks that are ignored for fresh sessions (ignored by default) -->
         <ignored>
-            <foo/>
-            <bar/>
+            <!-- Example:
+            <catalog.compare.sidebar/>
+            -->
         </ignored>
     </diehard>
     
