@@ -34,6 +34,11 @@
  * @category   Mage
  * @package    Mage_Core
  * @author      Magento Core Team <core@magentocommerce.com>
+ *
+ * Methods added by Cm_Diehard
+ * @method bool getBlockIsDynamic()
+ * @method bool getSuppressOutput()
+ * @method Mage_Core_Block_Abstract setSuppressOutput(bool $flag)
  */
 abstract class Mage_Core_Block_Abstract extends Varien_Object
 {
@@ -744,7 +749,7 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
 
         /* START: Added by Cm_Diehard */
         // if setBlockIsDynamic and setSuppressOutput then we automatically render only a placeholder tag.
-        if ($this->getData('block_is_dynamic') && Mage::registry('diehard_lifetime') && $this->getData('suppress_output')) {
+        if ($this->getBlockIsDynamic() && Mage::registry('diehard_lifetime') && $this->getSuppressOutput()) {
             $html = '';
             if ($this->_frameOpenTag) {
                 $html = '<'.$this->_frameOpenTag.'>'.$html.'<'.$this->_frameCloseTag.'>';
@@ -1259,20 +1264,36 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
     }
 
     /**
+     * @param string $namespace
+     * @param string $key
+     * @param bool|string $value
      * @param null|string|array $block
+     * @return void
      */
-    public function addDefaultIgnoredBlock($block = NULL)
+    public function ignoreBlockIf($namespace, $key, $value = TRUE, $block = NULL)
     {
         $helper = Mage::helper('diehard'); /* @var $helper Cm_Diehard_Helper_Data */
-        if ($block === NULL) {
-            $block = $this;
-        }
-        if (is_array($block)) {
-            foreach ($block as $_block) {
-                $helper->addIgnoredBlock($_block);
-            }
+        if (Mage::getSingleton($namespace)->getDataUsingMethod($key) == $value) {
+            $helper->addIgnoredBlock($block ? $block : $this);
         } else {
-            $helper->addIgnoredBlock($block);
+            $helper->removeIgnoredBlock($block ? $block : $this);
+        }
+    }
+
+    /**
+     * @param string $namespace
+     * @param string $key
+     * @param bool|string $value
+     * @param null|string|array $block
+     * @return void
+     */
+    public function ignoreBlockUnless($namespace, $key, $value = TRUE, $block = NULL)
+    {
+        $helper = Mage::helper('diehard'); /* @var $helper Cm_Diehard_Helper_Data */
+        if (Mage::getSingleton($namespace)->getDataUsingMethod($key) != $value) {
+            $helper->addIgnoredBlock($block ? $block : $this);
+        } else {
+            $helper->removeIgnoredBlock($block ? $block : $this);
         }
     }
 

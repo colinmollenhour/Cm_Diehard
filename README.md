@@ -85,44 +85,100 @@ that you can easily make your code not dependent on Cm_Diehard.
 
 ## Example Dynamic Block Injection
 
-    LAYOUT:
-    <reference name="top.links">
+There are many ways to handle dynamic blocks in cached pages. In general you must render generically
+for the cached responses and then regularly for the hole-punching responses. Here are some methods:
+
+### Placeholders only
+
+With this method the block will render only an empty div used as a placeholder for cached responses
+and then regularly for dynamic block injection. The advantage of this method is that no templates
+need to be modified or added and no block class overrides are needed, just a simple layout update.
+
+    <!-- LAYOUT -->
+    <block type="core/template" name="greeting" template="mymodule/greeting.phtml">
         <action method="setBlockIsDynamic"></action>
+        <action method="setSuppressOutput"><param>1</param></action>
+    </block>
+
+    <!-- TEMPLATE mymodule/greeting.phtml -->
+    <?php if( ! Mage::helper('customer')->isLoggedIn() ): ?>
+    <p><?php echo $this->__('Welcome!') ?></p>
+    <?php else: ?>
+    <p><?php echo $this->__('Welcome back, %s!', Mage::helper('customer')->getCustomerName()) ?>
+    <?php endif; ?>
+
+
+### Separate "cache-friendly" templates
+
+This method allows you to have a different template for cache-friendly output without having to modify
+any pre-existing templates or add logic to your template files.
+
+    <!-- LAYOUT -->
+    <block type="core/template" name="greeting" template="mymodule/greeting.phtml">
+        <action method="setBlockIsDynamic"></action>
+        <action method="setCacheFriendlyTemplate"><param>mymodule/cache-friendly/greeting.phtml</param></action>
     </reference>
-    HTML:
+
+    <!-- TEMPLATE mymodule/greeting.phtml -->
+    <?php if( ! Mage::helper('customer')->isLoggedIn() ): ?>
+    <p><?php echo $this->__('Welcome!') ?></p>
+    <?php else: ?>
+    <p><?php echo $this->__('Welcome back, %s!', Mage::helper('customer')->getCustomerName()) ?>
+    <?php endif; ?>
+
+    <!-- TEMPLATE mymodule/cache-friendly/greeting.phtml -->
+    <p><?php echo $this->__('Welcome!') ?></p>
+
+### Add logic to templates or _toHtml() methods.
+
+This method may be preferred if only a small portion of a template needs to be different for cached
+responses and you don't want to have separate template files or use the empty placeholders.
+
+    <!-- LAYOUT -->
+    <block type="core/template" name="greeting" template="mymodule/greeting.phtml">
+        <action method="setBlockIsDynamic"></action>
+    </block>
+
+    <!-- TEMPLATE mymodule/greeting.phtml -->
     <?php if( Mage::registry('diehard_lifetime') || ! Mage::helper('customer')->isLoggedIn() ): ?>
     <p><?php echo $this->__('Welcome!') ?></p>
     <?php else: ?>
     <p><?php echo $this->__('Welcome back, %s!', Mage::helper('customer')->getCustomerName()) ?>
     <?php endif; ?>
 
-In the above example, the page will load with "Welcome!" and then that will be replaced by javascript
-with "Welcome back, Colin Mollenhour!". This logic could also be added to a block with an overridden
-_toHtml() method.
+## "Ignoring" Dynamic Blocks
 
-Alternate method:
+In some cases the blocks indicated as being dynamic may not always actually be dynamic. If the
+cached version of the page will only need to be updated under certain circumstances you can add
+the block to a list of "ignored" blocks and remove it from the list when it needs to become dynamic
+again. When using Ajax for dynamic block injection, if all dynamic blocks are on the ignored blocks
+list then the Ajax request will be skipped entirely.
 
-    LAYOUT:
-    <reference name="top.links">
-        <action method="setBlockIsDynamic"></action>
-        <action method="setSuppressOutput"><param>1</param></action>
+### Ignore blocks via layout updates
+
+The methods available are ignoreBlockUnless(), which causes the block to be ignored if the specified
+session data is falsey or not equal, and ignoreBlockIf() which causes the block to be ignored if the
+session data equals the given value.
+
+    <!-- LAYOUT -->
+    <reference name="greeting">
+        <action method="ignoreBlockUnless">
+            <namespace>customer/session</namespace>
+            <key>customer_id</key>
+        </action>
     </reference>
 
-In the above example the top.links block will be rendered only as an empty placeholder to be filled
-by the hole-punching, therefore no template or block overrides are needed!
+### Ignore blocks via controllers or block methods
 
-## Ignoring Dynamic Blocks
+For greater flexibility you may need to add some logic to the controller, a block prepareLayout method
+or an event observer.
 
-In some cases the cached version of the page will only need to be updated under certain circumstances.
-In this case you can add the block to a list of "ignored" blocks and remove it from the list when it
-needs to become dynamic again.
-
-    CONTROLLER or BLOCK prepareLayout:
-    if (Mage::registry('diehard_lifetime'))
+    /* CONTROLLER or BLOCK prepareLayout() method or EVENT OBSERVER*/
+    if (Mage::registry('diehard')) { // Prevent errors in absence of Cm_Diehard module
         if ($this->getSession()->getSomeVariable()) {
-            Mage::registry('diehard')->addIgnoredBlock($this);
-        } else {
             Mage::registry('diehard')->removeIgnoredBlock($this);
+        } else {
+            Mage::registry('diehard')->addIgnoredBlock($this);
         }
     }
 
