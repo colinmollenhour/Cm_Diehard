@@ -51,15 +51,17 @@ A falsey value (0, null, false, '') for the cache lifetime disables caching for 
 
 ### config.xml
 
-Set the lifetime in seconds based on the full action name:
+Set the lifetime in seconds based on the full action name in config.xml:
 
     <config>
-        <diehard>
-            <actions>
-                <cms_index_index>86400</cms_index_index>
-                <cms_page_view>86400</cms_page_view>
-            </actions>
-        </diehard>
+        <frontend>
+            <diehard>
+                <actions>
+                    <cms_index_index>86400</cms_index_index>
+                    <cms_page_view>86400</cms_page_view>
+                </actions>
+            </diehard>
+        </frontend>
     </config>
 
 ### Layout updates

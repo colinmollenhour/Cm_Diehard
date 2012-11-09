@@ -44,6 +44,42 @@
                 </observers>
             </application_clean_cache>
         </events>
+        <diehard>
+
+            <!-- List of available cache backend models -->
+            <backends>
+                <magento>
+                    <label>Magento Cache</label>
+                    <model>diehard/backend_magento</model>
+                </magento>
+                <file>
+                    <label>File Cache</label>
+                    <model>diehard/backend_file</model>
+                </file>
+                <proxy>
+                    <label>Basic Reverse-Proxy Cache</label>
+                    <model>diehard/backend_proxy</model>
+                </proxy>
+                <revalidating>
+                    <label>Re-validating Reverse-Proxy Cache</label>
+                    <model>diehard/backend_revalidating</model>
+                </revalidating>
+            </backends>
+
+            <!-- Supported javascript libraries for dynamic block replacement -->
+            <jslibs>
+                <prototype>
+                    <label>Prototype (default)</label>
+                    <path>diehard/fpc-prototype.js</path>
+                </prototype>
+                <!-- Not currently implemented
+                <jquery>
+                    <label>jQuery</label>
+                    <path>diehard/fpc-jquery.js</path>
+                </jquery>
+                -->
+            </jslibs>
+        </diehard>
     </global>
 
     <frontend>
@@ -99,59 +135,24 @@
             </model_load_after>
             -->
         </events>
+
+        <diehard>
+            <!-- Cacheable actions and their lifetimes -->
+            <actions>
+                <!-- Example:
+                <catalog_product_view>86400</catalog_product_view>
+                -->
+            </actions>
+
+            <!-- Dynamic blocks that are ignored for fresh sessions (ignored by default) -->
+            <ignored_blocks>
+                <!-- Example:
+                <catalog.compare.sidebar/>
+                -->
+            </ignored_blocks>
+        </diehard>
     </frontend>
 
-    <diehard>
-
-        <!-- Cacheable actions and their lifetimes -->
-        <actions>
-            <!-- Example:
-            <catalog_product_view>86400</catalog_product_view>
-            -->
-        </actions>
-
-        <!-- List of available cache backend models -->
-        <backends>
-            <magento>
-                <label>Magento Cache</label>
-                <model>diehard/backend_magento</model>
-            </magento>
-            <file>
-                <label>File Cache</label>
-                <model>diehard/backend_file</model>
-            </file>
-            <proxy>
-                <label>Basic Reverse-Proxy Cache</label>
-                <model>diehard/backend_proxy</model>
-            </proxy>
-            <revalidating>
-                <label>Re-validating Reverse-Proxy Cache</label>
-                <model>diehard/backend_revalidating</model>
-            </revalidating>
-        </backends>
-
-        <!-- Supported javascript libraries for dynamic block replacement -->
-        <jslibs>
-            <prototype>
-                <label>Prototype (default)</label>
-                <path>diehard/fpc-prototype.js</path>
-            </prototype>
-            <!-- Not currently implemented
-            <jquery>
-                <label>jQuery</label>
-                <path>diehard/fpc-jquery.js</path>
-            </jquery>
-            -->
-        </jslibs>
-
-        <!-- Dynamic blocks that are ignored for fresh sessions (ignored by default) -->
-        <ignored>
-            <!-- Example:
-            <catalog.compare.sidebar/>
-            -->
-        </ignored>
-    </diehard>
-    
     <default>
         <system>
             <diehard>

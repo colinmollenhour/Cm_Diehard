@@ -158,7 +158,7 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function addDefaultIgnoredBlocks()
     {
-        foreach(Mage::getConfig()->getNode('diehard/ignored')->asArray() as $block => $_) {
+        foreach(Mage::getConfig()->getNode(Mage::app()->getLayout()->getArea().'/diehard/ignored_blocks')->asArray() as $block => $_) {
             $this->addIgnoredBlock($block);
         }
     }
@@ -240,7 +240,7 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isCacheableAction($fullActionName)
     {
-        $lifeTime = Mage::app()->getConfig()->getNode('diehard/actions/'.$fullActionName);
+        $lifeTime = Mage::app()->getConfig()->getNode(Mage::app()->getLayout()->getArea().'/diehard/actions/'.$fullActionName);
         if($lifeTime) {
             return intval($lifeTime);
         }
@@ -253,7 +253,7 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     public function getBackendModel()
     {
         $backend = Mage::getStoreConfig(self::XML_PATH_BACKEND);
-        return (string) Mage::getConfig()->getNode('diehard/backends/'.$backend.'/model');
+        return (string) Mage::getConfig()->getNode('global/diehard/backends/'.$backend.'/model');
     }
 
     /**
@@ -262,7 +262,7 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     public function getBackendLabel()
     {
         $backend = Mage::getStoreConfig(self::XML_PATH_BACKEND);
-        return (string) Mage::getConfig()->getNode('diehard/backends/'.$backend.'/label');
+        return (string) Mage::getConfig()->getNode('global/diehard/backends/'.$backend.'/label');
     }
 
     /**

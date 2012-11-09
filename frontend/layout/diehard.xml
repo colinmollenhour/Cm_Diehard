@@ -8,7 +8,7 @@
 
         <!-- After all dynamic blocks are rendered, render block which aides in dynamic block replacement -->
         <reference name="before_body_end">
-            <block type="diehard/beforebodyend" name="diehard_end" template="diehard/beforebodyend.phtml" after="-"></block>
+            <block type="diehard/beforebodyend" name="diehard_end" template="diehard/beforebodyend.phtml" after="-" />
         </reference>
 
     </default>
