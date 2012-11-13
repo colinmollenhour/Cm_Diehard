@@ -85,9 +85,12 @@ that you can easily make your code not dependent on Cm_Diehard.
 
     Mage::registry('diehard') && Mage::helper('diehard')->setLifetime(300);
 
-## Example Dynamic Block Injection
+## Public vs Private Domain
 
-There are many ways to handle dynamic blocks in cached pages. In general you must render generically
+You must take care that when caching is enabled for a page that you don't render anything that is
+specific to an individual visitor. The classic example is the "My Cart" link in the header which
+displays the number of items in the cart and the "Log In"/"Log Out" links. There are many ways to
+handle these private or "dynamic" blocks in cached pages. In general you must render generically
 for the cached responses and then regularly for the hole-punching responses. Here are some methods:
 
 ### Placeholders only
@@ -131,7 +134,32 @@ any pre-existing templates or add logic to your template files.
     <!-- TEMPLATE mymodule/cache-friendly/greeting.phtml -->
     <p><?php echo $this->__('Welcome!') ?></p>
 
-### Add logic to templates or _toHtml() methods.
+### Add logic using a helper method
+
+The Mage_Core_Block_Abstract class has another helpful method added to it which allows you to pass the block
+instance to a helper method so that you can use logic on the block instance without overriding the block or adding
+expensive event observers. Note that the method will only be called if the page is being cached.
+
+    <!-- LAYOUT -->
+    <reference name="checkout_cart_link">
+        <action method="callHelper"><helper>my_diehard</helper></action>
+    </reference>
+
+    <!-- My_Diehard_Helper_Data -->
+    /**
+     * Always render cart link as "My Cart" when caching is active.
+     *
+     * @param Mage_Checkout_Block_Links $block
+     */
+    public function checkout_cart_link(Mage_Checkout_Block_Links $block)
+    {
+        $parentBlock = $block->getParentBlock(); /* @var $parentBlock Mage_Page_Block_Template_Links */
+        $text = $block->__('My Cart');
+        $parentBlock->removeLinkByUrl($block->getUrl('checkout/cart'));
+        $parentBlock->addLink($text, 'checkout/cart', $text, true, array(), 50, null, 'class="top-link-cart"');
+    }
+
+### Add logic to templates or block methods
 
 This method may be preferred if only a small portion of a template needs to be different for cached
 responses and you don't want to have separate template files or use the empty placeholders.

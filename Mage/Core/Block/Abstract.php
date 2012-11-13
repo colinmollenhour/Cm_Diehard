@@ -35,7 +35,7 @@
  * @package    Mage_Core
  * @author      Magento Core Team <core@magentocommerce.com>
  *
- * Methods added by Cm_Diehard
+ * Magic methods added by Cm_Diehard:
  * @method bool getBlockIsDynamic()
  * @method bool getSuppressOutput()
  * @method Mage_Core_Block_Abstract setSuppressOutput(bool $flag)
@@ -1295,6 +1295,46 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
         } else {
             $helper->removeIgnoredBlock($block ? $block : $this);
         }
+    }
+
+    /**
+     * Workaround to allow easily adding methods to a block without overriding the block.
+     * The specified helper is called with the method name being the block's "name" in the layout
+     * with non-alphanumeric characters replaced with underscores and the first argument being the
+     * block instance. Note that the method is only called if the page is being cached.
+     *
+     * Layout Example:
+     * <reference name="right.links">
+     *     <action method="callHelper"><helper>foo</helper></action>
+     *     <action method="callHelper"><helper>foo::bar</helper></action>
+     * </reference>
+     *
+     * Effectively:
+     * Mage::helper('foo')->right_links($block);
+     * Mage::helper('foo')->bar($block);
+     *
+     * param string $helperName
+     */
+    public function callHelper()
+    {
+        if ( ! Mage::registry('diehard_lifetime')) {
+            return;
+        }
+
+        $args = func_get_args();
+        $helperName = array_shift($args);
+        array_unshift($args, $this);
+        if ( ! $helperName) {
+            Mage::throwException('Helper not specified to callHelper.');
+        }
+        if (strpos($helperName, '::') !== false) {
+            list($helperName, $method) = explode('::', $helperName, 2);
+        } else {
+            $method = $this->getNameInLayout();
+        }
+        $method = preg_replace('/[^a-zA-Z0-9]+/', '_', $method);
+        $helper = Mage::helper($helperName);
+        call_user_func_array(array($helper, $method), $args);
     }
 
 }
