@@ -203,7 +203,8 @@ to the dynamic renderer layout:
     </DIEHARD_default>
 
 When using this method you must be sure that the block names match the corresponding blocks in the
-layout used for the cached response.
+layout used for the cached response. Blocks can be added directly to the root of the layout handle,
+they do not need to be children of another block.
 
 ## "Ignoring" Dynamic Blocks
 
