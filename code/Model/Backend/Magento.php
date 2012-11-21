@@ -122,10 +122,13 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             }
 
             if($this->getUseCachedResponse()) {
-                $body = Mage::app()->loadCache($cacheKey);
-                // Inject dynamic content replacement at end of body
-                $body = $this->injectDynamicBlocks($body);
-                return $body;
+                if ($body = Mage::app()->loadCache($cacheKey)) {
+                    // Inject dynamic content replacement at end of body
+                    $body = $this->injectDynamicBlocks($body);
+                    return $body;
+                } else {
+                    $this->setUseCachedResponse(NULL);
+                }
             }
         }
         return FALSE;
@@ -137,6 +140,8 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
      */
     public function injectDynamicBlocks($body)
     {
+        // TODO - attempt to render blocks without use of controller by using xml config + models
+        // TODO - initialize block data somehow from block placeholders
         if ($params = $this->extractParamsFromBody($body)) {
             $dynamic = $this->getDynamicBlockReplacement($params);
             $_body = $this->replaceParamsInBody($body, $dynamic);

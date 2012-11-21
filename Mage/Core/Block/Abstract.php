@@ -749,12 +749,12 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
 
         /* START: Added by Cm_Diehard */
         // if setBlockIsDynamic and setSuppressOutput then we automatically render only a placeholder tag.
-        if ($this->getBlockIsDynamic() && Mage::registry('diehard_lifetime') && $this->getSuppressOutput()) {
-            $html = '';
-            if ($this->_frameOpenTag) {
-                $html = '<'.$this->_frameOpenTag.'>'.$html.'<'.$this->_frameCloseTag.'>';
-            }
-            return $html;
+        if ($this->getBlockIsDynamic() && Mage::registry('diehard_lifetime')) {
+          if ($this->getSuppressOutput()) {
+            return '<div id="'.$this->getDiehardHtmlId().'"></div>';
+          } else if (FALSE /* TODO - backend uses inline replacement */) {
+            return '<!-- DIEHARD_BLOCK|'.$this->getDiehardHtmlId().'|'.json_encode($this->getCacheKeyInfo()).' -->';
+          }
         }
         /* END: Added by Cm_Diehard */
 
@@ -1181,7 +1181,19 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
         if (is_null($this->getCacheLifetime()) || !Mage::app()->useCache(self::CACHE_GROUP)) {
             return false;
         }
-        return Mage::app()->loadCache($this->getCacheKey());
+
+        /* START: Changed by Cm_Diehard */
+        // If cache load is successful, add cache record tags to diehard tags
+        $cacheKey = $this->getCacheKey();
+        $data = Mage::app()->loadCache($cacheKey);
+        if ($data && Mage::helper('diehard')->getLifetime()) {
+            $metadata = Mage::app()->getCacheInstance()->getFrontend()->getMetadatas($cacheKey);
+            if ($metadata && ! empty($metadata['tags'])) {
+                Mage::helper('diehard')->addTags($metadata['tags']);
+            }
+        }
+        return $data;
+        /* END: Changed by Cm_Diehard */
     }
 
     /**
@@ -1195,14 +1207,24 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
         if (is_null($this->getCacheLifetime()) || !Mage::app()->useCache(self::CACHE_GROUP)) {
             return false;
         }
-        Mage::app()->saveCache($data, $this->getCacheKey(), $this->_getCacheTags(), $this->getCacheLifetime());
+
+        /* START: Changed by Cm_Diehard */
+        // Add block cache tags to diehard tags
+        $tags = $this->getCacheTags();
+        if(Mage::helper('diehard')->getLifetime()) {
+            Mage::helper('diehard')->addTags($tags);
+        }
+        Mage::app()->saveCache($data, $this->getCacheKey(), $tags, $this->getCacheLifetime());
+        /* END: Changed by Cm_Diehard */
         return $this;
     }
 
-    /*                                                             ^
-     *  Additions for Cm_Diehard module                            |
-     *    Note this change: ---------------------------------------+
-     *    Also note change to toHtml() method.
+    /*
+     *  Changes to core methods (above):
+     *   - toHtml
+     *   - _loadCache
+     *   - _saveCache
+     *  Additions for Cm_Diehard module (below):
      */
 
     /**
@@ -1237,21 +1259,6 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
             return 'dh:'.preg_replace('/[^a-zA-Z0-9]+/', '_', $this->getNameInLayout());
         }
         return $this->getData('diehard_html_id');
-    }
-
-    /**
-     * Add block cache tags to page cache tags so page is invalidated if block is invalidated.
-     *
-     * @return array
-     */
-    protected function _getCacheTags()
-    {
-        $tags = $this->getCacheTags();
-        if(Mage::helper('diehard')->getLifetime()) {
-            // TODO - should we remove self::CACHE_GROUP?
-            Mage::helper('diehard')->addTags($tags);
-        }
-        return $tags;
     }
 
     /**

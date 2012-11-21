@@ -22,11 +22,14 @@ Note that all injection methods use a single injection point rather than one for
 
 ### Magento Backend
 
-This backend is like the Enterprise FPC except it does server-side hole punching. It does a lightweight
-cached response by default, and appends some javascript to inject the dynamic blocks when needed.
+This backend is like the Enterprise FPC except it currently uses Javascript (but not Ajax) for hole
+punching. It does a lightweight cached response by default, and appends the dynamic blocks to the response.
+The purpose for this backend is mainly to make testing easier in the absence of a reverse proxy although
+it should still have much better performance than no caching at all.
 
-This backend currently uses the core Magento cache storage for it's cache storage although this will be
-changed to support any arbitrary cache backend.
+NOTE: This backend currently uses the core Magento cache storage for it's cache storage so be prepared
+for your cache storage to increase drastically. This will eventually be changed to support a cache backend
+separate from the core cache backend.
 
 ### Proxy Backend
 
@@ -175,6 +178,32 @@ responses and you don't want to have separate template files or use the empty pl
     <?php else: ?>
     <p><?php echo $this->__('Welcome back, %s!', Mage::helper('customer')->getCustomerName()) ?>
     <?php endif; ?>
+
+## Rendering Dynamic Blocks
+
+For the dynamic blocks to be rendered they need to be made accessible to the layout. By default
+there are no blocks in the layout handles that are used to render the dynamic blocks, they must be
+added as needed. The layout handles that should be used are: DIEHARD_default and DIEHARD_{full_action_name}.
+This allows you to keep the layout for the rendering of dynamic blocks lightweight, but as with any
+other layout handle, these can inherit from others so you generally have two methods of adding blocks
+to the dynamic renderer layout:
+
+### Inheritance
+
+    <!--LAYOUT -->
+    <DIEHARD_default>
+        <update handle="default"/>
+    </DIEHARD>
+
+### À la carte
+
+    <!-- LAYOUT -->
+    <DIEHARD_default>
+        <block type="core/template" name="greeting" template="mymodule/greeting.phtml"/>
+    </DIEHARD_default>
+
+When using this method you must be sure that the block names match the corresponding blocks in the
+layout used for the cached response.
 
 ## "Ignoring" Dynamic Blocks
 

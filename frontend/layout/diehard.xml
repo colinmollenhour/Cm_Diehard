@@ -12,4 +12,10 @@
         </reference>
 
     </default>
+
+    <!-- Add dynamic blocks here -->
+    <DIEHARD_default translate="label">
+        <label>Cached Dynamic Blocks (Cm_Diehard)</label>
+    </DIEHARD_default>
+
 </layout>

@@ -16,6 +16,11 @@ class Cm_Diehard_LoadController extends Mage_Core_Controller_Front_Action
      */
     protected function _getResponseObject()
     {
+        // Disable caching mode temporarily
+        $helper = Mage::helper('diehard'); /* @var $helper Cm_Diehard_Helper_Data */
+        $oldLifetime = $helper->getLifetime();
+        $helper->setLifetime(FALSE);
+
         $response = array(
             'blocks' => array(),
             'ignoreBlocks' => array(),
@@ -34,7 +39,6 @@ class Cm_Diehard_LoadController extends Mage_Core_Controller_Front_Action
 
         // Add handles to layout
         $handles = array(
-            'default',
             'DIEHARD_default',
             'DIEHARD_'.$this->getRequest()->getParam('full_action_name')
         );
@@ -61,6 +65,9 @@ class Cm_Diehard_LoadController extends Mage_Core_Controller_Front_Action
                 }
             }
         }
+
+        // Restore caching mode
+        $helper->setLifetime($oldLifetime);
 
         return $response;
     }
