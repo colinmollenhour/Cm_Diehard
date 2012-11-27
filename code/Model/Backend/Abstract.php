@@ -124,7 +124,7 @@ abstract class Cm_Diehard_Model_Backend_Abstract
     public function extractParamsFromBody($body)
     {
         if ( ! preg_match('|<!-- ###DIEHARD:(.+)### -->|', $body, $matches)) {
-            Mage::log('Could not extract dynamic parameters from body of response.', Zend_Log::ALERT);
+            return FALSE;
         }
         return json_decode($matches[1], true);
     }
