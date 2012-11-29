@@ -1267,7 +1267,9 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
     public function setDiehardCacheLifetime($lifetime = FALSE)
     {
         $helper = Mage::helper('diehard'); /* @var $helper Cm_Diehard_Helper_Data */
-        $helper->setLifetime($lifetime);
+        if ($helper->isEnabled() && $this->getRequest()->isGet()) {
+            $helper->setLifetime($lifetime);
+        }
     }
 
     /**
@@ -1342,6 +1344,15 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
         $method = preg_replace('/[^a-zA-Z0-9]+/', '_', $method);
         $helper = Mage::helper($helperName);
         call_user_func_array(array($helper, $method), $args);
+    }
+
+    /**
+     * Add this block to the list of blocks which are ignored by default
+     */
+    public function addDefaultIgnored()
+    {
+        $helper = Mage::helper('diehard'); /* @var $helper Cm_Diehard_Helper_Data */
+        $helper->addDefaultIgnoredBlock($this);
     }
 
 }

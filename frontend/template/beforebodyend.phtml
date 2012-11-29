@@ -4,6 +4,7 @@
 <script type="text/javascript">
 //<![CDATA[
     var diehard = new Diehard('<?php echo $this->getLoadAjaxUrl() ?>', '<?php echo $this->getAction()->getFullActionName() ?>');
+    diehard.setDefaultIgnoredBlocks(<?php echo json_encode($this->diehard()->getDefaultIgnoredBlocks()) ?>);
     diehard.setParams(<?php echo json_encode($this->diehard()->getDynamicParams()) ?>);
     diehard.setBlocks(<?php echo json_encode($this->diehard()->getDynamicBlocks()) ?>);
 //]]>

@@ -25,6 +25,8 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
 
     protected $_blocks = array();
 
+    protected $_defaultIgnoredBlocks = array();
+
     protected $_addedIgnoredBlocks = array();
 
     protected $_removedIgnoredBlocks = array();
@@ -61,10 +63,12 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * @param  bool|int $lifetime
-     * @return void
      */
     public function setLifetime($lifetime)
     {
+        if ( ! $this->isEnabled()) {
+            return;
+        }
         Mage::unregister('diehard_lifetime');
         if($lifetime = (int)$lifetime) {
             Mage::register('diehard_lifetime', $lifetime);
@@ -150,19 +154,6 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->_removedIgnoredBlocks;
     }
 
-
-    /**
-     * Add list of ignored blocks from config for fresh sessions
-     *
-     * @return void
-     */
-    public function addDefaultIgnoredBlocks()
-    {
-        foreach(Mage::getConfig()->getNode(Mage::app()->getLayout()->getArea().'/diehard/ignored_blocks')->asArray() as $block => $_) {
-            $this->addIgnoredBlock($block);
-        }
-    }
-
     /**
      * Get the ignored blocks for the current session (cookie value)
      *
@@ -171,7 +162,7 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     public function getIgnoredBlocks()
     {
         $ignoredBlocks = Mage::getSingleton('core/cookie')->get(self::COOKIE_IGNORED_BLOCKS);
-        return ($ignoredBlocks === false ? NULL : explode(',', $ignoredBlocks));
+        return ($ignoredBlocks === NULL ? NULL : explode(',', $ignoredBlocks));
     }
 
     /**
@@ -184,6 +175,29 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $ignoredBlocks = implode(',', $ignoredBlocks);
         Mage::getSingleton('core/cookie')->set(self::COOKIE_IGNORED_BLOCKS, $ignoredBlocks);
+    }
+
+    /**
+     * Get the accumulated list of blocks which are ignored by default
+     *
+     * @return array
+     */
+    public function getDefaultIgnoredBlocks()
+    {
+        return $this->_defaultIgnoredBlocks;
+    }
+
+    /**
+     * Add a block to the list of blocks which are ignored by default
+     *
+     * @param string|Mage_Core_Block_Abstract $block
+     */
+    public function addDefaultIgnoredBlock($block)
+    {
+        if ($block instanceof Mage_Core_Block_Abstract) {
+            $block = $block->getNameInLayout();
+        }
+        $this->_defaultIgnoredBlocks[] = $block;
     }
 
     /**

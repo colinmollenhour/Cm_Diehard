@@ -6,6 +6,7 @@ Diehard.prototype =
         this.action = action;
         this.params = {};
         this.blocks = {};
+        this.defaultIgnored = [];
         document.observe('dom:loaded', this.loadDynamicContent.bind(this));
     },
 
@@ -17,9 +18,19 @@ Diehard.prototype =
         this.blocks = blocks;
     },
 
+    setDefaultIgnored: function(blocks) {
+        this.defaultIgnored = blocks;
+    },
+
     loadDynamicContent: function() {
         // Remove ignored blocks
-        var ignored = Mage.Cookie.get('diehard_ignored').split(',');
+        var ignored = Mage.Cookies.get('diehard_ignored');
+        if (ignored === null) { // No cookie means user has only hit cached pages thus far
+          // Use all default ignored blocks as ignored blocks
+          ignored = this.defaultIgnored;
+        } else { // Otherwise, if cookie is present then only ignore blocks that are in the cookie
+          ignored = ignored.split(',');
+        }
         this.blocks = $H(this.blocks).inject({}, function(acc, pair){
             if( ! ignored.member(pair.value)) {
                 acc[pair.key] = pair.value;

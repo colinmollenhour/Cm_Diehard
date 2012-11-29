@@ -23,8 +23,8 @@ class Cm_Diehard_Model_Observer
     public function controllerActionPredispatch(Varien_Event_Observer $observer)
     {
         Mage::register('diehard', $this->helper());
-        if($this->helper()->isEnabled() && Mage::app()->getRequest()->isGet()) {
-
+        if ($this->helper()->isEnabled() && Mage::app()->getRequest()->isGet())
+        {
             $fullActionName = $observer->getControllerAction()->getFullActionName();
 
             $lifetime = $this->helper()->isCacheableAction($fullActionName);
@@ -32,11 +32,6 @@ class Cm_Diehard_Model_Observer
             {
                 // Set current request as cacheable for the given lifetime
                 $this->helper()->setLifetime($lifetime);
-
-                // Set default ignored blocks for new sessions
-                if( $this->helper()->getIgnoredBlocks() === NULL) {
-                    $this->helper()->addDefaultIgnoredBlocks();
-                }
             }
         }
     }
@@ -60,6 +55,9 @@ class Cm_Diehard_Model_Observer
 
             // Update ignored blocks cookie
             $ignored = (array) $this->helper()->getIgnoredBlocks();
+            if ($ignored === NULL) {
+              $ignored = $this->helper()->getDefaultIgnoredBlocks();
+            }
             $addedIgnored = $this->helper()->getAddedIgnoredBlocks();
             $removedIgnored = $this->helper()->getRemovedIgnoredBlocks();
             $ignored = array_unique(array_merge($ignored, $addedIgnored));

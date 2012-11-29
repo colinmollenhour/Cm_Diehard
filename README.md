@@ -206,7 +206,7 @@ When using this method you must be sure that the block names match the correspon
 layout used for the cached response. Blocks can be added directly to the root of the layout handle,
 they do not need to be children of another block.
 
-## "Ignoring" Dynamic Blocks
+## Adding and Removing "Ignored" Dynamic Blocks
 
 In some cases the blocks indicated as being dynamic may not always actually be dynamic. If the
 cached version of the page will only need to be updated under certain circumstances you can add
@@ -241,6 +241,31 @@ or an event observer.
             Mage::registry('diehard')->addIgnoredBlock($this);
         }
     }
+
+## Default Ignored Blocks
+
+In order to allow for proper handling of the case where a user hits a cached page on his first visit
+and there would be no way to know which blocks can be ignored, a list of "default" ignored blocks is
+generated for each page to be used when the user has not yet been cookied. A block can be added to
+the list of default ignored blocks at any time during page rendering using either the layout or the
+helper method.
+
+### Layout
+
+The easiest to maintain method may be in the layout.
+
+    <!-- LAYOUT -->
+    <reference name="greeting">
+        <action method="addDefaultIgnored" />
+    </reference>
+
+### Helper
+
+    <!-- Event Observer, constructor or other -->
+    Mage::helper('diehard')->addDefaultIgnoredBlock('greeting');
+
+In both examples the "greeting" block will be ignored by default for all users until it is explicitly removed
+from the ignored blocks list.
 
 ## License
 

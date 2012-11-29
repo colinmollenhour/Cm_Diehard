@@ -143,13 +143,6 @@
                 <catalog_product_view>86400</catalog_product_view>
                 -->
             </actions>
-
-            <!-- Dynamic blocks that are ignored for fresh sessions (ignored by default) -->
-            <ignored_blocks>
-                <!-- Example:
-                <catalog.compare.sidebar/>
-                -->
-            </ignored_blocks>
         </diehard>
     </frontend>
 

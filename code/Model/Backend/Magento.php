@@ -110,8 +110,9 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
      */
     public function extractContent($content)
     {
+        // TODO - canUse()?
         $cacheKey = $this->getCacheKey();
-        if(Mage::app()->getCacheInstance()->getFrontend()->test($cacheKey)) {
+        if(Mage::app()->getCacheInstance()->getFrontend()->test(strtoupper($cacheKey))) {
             $this->setUseCachedResponse(TRUE);
 
             // Allow external code to cancel the sending of a cached response
@@ -125,6 +126,7 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
                 if ($body = Mage::app()->loadCache($cacheKey)) {
                     // Inject dynamic content replacement at end of body
                     $body = $this->injectDynamicBlocks($body);
+                    Mage::app()->getResponse()->setHeader('X-Diehard', 'HIT');
                     return $body;
                 } else {
                     $this->setUseCachedResponse(NULL);
