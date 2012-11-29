@@ -56,29 +56,33 @@ A falsey value (0, null, false, '') for the cache lifetime disables caching for 
 
 Set the lifetime in seconds based on the full action name in config.xml:
 
-    <config>
-        <frontend>
-            <diehard>
-                <actions>
-                    <cms_index_index>86400</cms_index_index>
-                    <cms_page_view>86400</cms_page_view>
-                </actions>
-            </diehard>
-        </frontend>
-    </config>
+```xml
+<config>
+    <frontend>
+        <diehard>
+            <actions>
+                <cms_index_index>86400</cms_index_index>
+                <cms_page_view>86400</cms_page_view>
+            </actions>
+        </diehard>
+    </frontend>
+</config>
+```
 
 ### Layout updates
 
 Every block inherits a new method named "setDiehardCacheLifetime" which takes the desired lifetime
 in seconds. Layout updates will override the values in config.xml.
 
-    <layout>
-        <cms_page_view>
-            <reference name="root">
-                <action method="setDiehardCacheLifetime"><int>300</int></action>
-            </reference>
-        </cms_page_view>
-    </layout>
+```xml
+<layout>
+    <cms_page_view>
+        <reference name="root">
+            <action method="setDiehardCacheLifetime"><int>300</int></action>
+        </reference>
+    </cms_page_view>
+</layout>
+```
 
 ### Event observers, controllers, blocks, etc..
 
@@ -86,7 +90,9 @@ In any code before the `http_response_send_before` event is dispatched, you can 
 using the 'diehard' helper. The helper is added to the Magento registry with the key 'diehard' so
 that you can easily make your code not dependent on Cm_Diehard.
 
+```php
     Mage::registry('diehard') && Mage::helper('diehard')->setLifetime(300);
+```
 
 ## Public vs Private Domain
 
@@ -102,18 +108,22 @@ With this method the block will render only an empty div used as a placeholder f
 and then regularly for dynamic block injection. The advantage of this method is that no templates
 need to be modified or added and no block class overrides are needed, just a simple layout update.
 
-    <!-- LAYOUT -->
+```xml
+<!-- LAYOUT -->
     <block type="core/template" name="greeting" template="mymodule/greeting.phtml">
         <action method="setBlockIsDynamic"></action>
         <action method="setSuppressOutput"><param>1</param></action>
     </block>
+```
 
-    <!-- TEMPLATE mymodule/greeting.phtml -->
-    <?php if( ! Mage::helper('customer')->isLoggedIn() ): ?>
-    <p><?php echo $this->__('Welcome!') ?></p>
-    <?php else: ?>
-    <p><?php echo $this->__('Welcome back, %s!', Mage::helper('customer')->getCustomerName()) ?>
-    <?php endif; ?>
+```php
+<!-- TEMPLATE mymodule/greeting.phtml -->
+<?php if( ! Mage::helper('customer')->isLoggedIn() ): ?>
+<p><?php echo $this->__('Welcome!') ?></p>
+<?php else: ?>
+<p><?php echo $this->__('Welcome back, %s!', Mage::helper('customer')->getCustomerName()) ?>
+<?php endif; ?>
+```
 
 
 ### Separate "cache-friendly" templates
@@ -121,21 +131,25 @@ need to be modified or added and no block class overrides are needed, just a sim
 This method allows you to have a different template for cache-friendly output without having to modify
 any pre-existing templates or add logic to your template files.
 
-    <!-- LAYOUT -->
+```xml
+<!-- LAYOUT -->
     <block type="core/template" name="greeting" template="mymodule/greeting.phtml">
         <action method="setBlockIsDynamic"></action>
         <action method="setCacheFriendlyTemplate"><param>mymodule/cache-friendly/greeting.phtml</param></action>
     </reference>
+```
 
-    <!-- TEMPLATE mymodule/greeting.phtml -->
-    <?php if( ! Mage::helper('customer')->isLoggedIn() ): ?>
-    <p><?php echo $this->__('Welcome!') ?></p>
-    <?php else: ?>
-    <p><?php echo $this->__('Welcome back, %s!', Mage::helper('customer')->getCustomerName()) ?>
-    <?php endif; ?>
+```php
+<!-- TEMPLATE mymodule/greeting.phtml -->
+<?php if( ! Mage::helper('customer')->isLoggedIn() ): ?>
+<p><?php echo $this->__('Welcome!') ?></p>
+<?php else: ?>
+<p><?php echo $this->__('Welcome back, %s!', Mage::helper('customer')->getCustomerName()) ?>
+<?php endif; ?>
 
-    <!-- TEMPLATE mymodule/cache-friendly/greeting.phtml -->
-    <p><?php echo $this->__('Welcome!') ?></p>
+<!-- TEMPLATE mymodule/cache-friendly/greeting.phtml -->
+<p><?php echo $this->__('Welcome!') ?></p>
+```
 
 ### Add logic using a helper method
 
@@ -143,12 +157,15 @@ The Mage_Core_Block_Abstract class has another helpful method added to it which 
 instance to a helper method so that you can use logic on the block instance without overriding the block or adding
 expensive event observers. Note that the method will only be called if the page is being cached.
 
-    <!-- LAYOUT -->
+```xml
+<!-- LAYOUT -->
     <reference name="checkout_cart_link">
         <action method="callHelper"><helper>my_diehard</helper></action>
     </reference>
+```
 
-    <!-- My_Diehard_Helper_Data -->
+```php
+<!-- My_Diehard_Helper_Data -->
     /**
      * Always render cart link as "My Cart" when caching is active.
      *
@@ -161,23 +178,28 @@ expensive event observers. Note that the method will only be called if the page 
         $parentBlock->removeLinkByUrl($block->getUrl('checkout/cart'));
         $parentBlock->addLink($text, 'checkout/cart', $text, true, array(), 50, null, 'class="top-link-cart"');
     }
+```
 
 ### Add logic to templates or block methods
 
 This method may be preferred if only a small portion of a template needs to be different for cached
 responses and you don't want to have separate template files or use the empty placeholders.
 
-    <!-- LAYOUT -->
+```xml
+<!-- LAYOUT -->
     <block type="core/template" name="greeting" template="mymodule/greeting.phtml">
         <action method="setBlockIsDynamic"></action>
     </block>
+```
 
-    <!-- TEMPLATE mymodule/greeting.phtml -->
+```php
+<!-- TEMPLATE mymodule/greeting.phtml -->
     <?php if( Mage::registry('diehard_lifetime') || ! Mage::helper('customer')->isLoggedIn() ): ?>
     <p><?php echo $this->__('Welcome!') ?></p>
     <?php else: ?>
     <p><?php echo $this->__('Welcome back, %s!', Mage::helper('customer')->getCustomerName()) ?>
     <?php endif; ?>
+```
 
 ## Rendering Dynamic Blocks
 
@@ -190,17 +212,21 @@ to the dynamic renderer layout:
 
 ### Inheritance
 
-    <!--LAYOUT -->
+```xml
+<!--LAYOUT -->
     <DIEHARD_default>
         <update handle="default"/>
     </DIEHARD>
+```
 
 ### À la carte
 
-    <!-- LAYOUT -->
+```xml
+<!-- LAYOUT -->
     <DIEHARD_default>
         <block type="core/template" name="greeting" template="mymodule/greeting.phtml"/>
     </DIEHARD_default>
+```
 
 When using this method you must be sure that the block names match the corresponding blocks in the
 layout used for the cached response. Blocks can be added directly to the root of the layout handle,
@@ -216,23 +242,26 @@ list then the Ajax request will be skipped entirely.
 
 ### Ignore blocks via layout updates
 
-The methods available are ignoreBlockUnless(), which causes the block to be ignored if the specified
-session data is falsey or not equal, and ignoreBlockIf() which causes the block to be ignored if the
-session data equals the given value.
+The methods available to blocks are `ignoreBlockUnless()`, which causes the block to be ignored **unless** the specified
+session data is present, and `ignoreBlockIf()` which causes the block to be ignored **if** the session data is present.
 
-    <!-- LAYOUT -->
+```xml
+<!-- LAYOUT -->
     <reference name="greeting">
         <action method="ignoreBlockUnless">
-            <namespace>customer/session</namespace>
-            <key>customer_id</key>
+            <variables>
+                <customer>customer/session::customer_id</customer>
+            </variables>
         </action>
     </reference>
+```
 
 ### Ignore blocks via controllers or block methods
 
 For greater flexibility you may need to add some logic to the controller, a block prepareLayout method
 or an event observer.
 
+```php
     /* CONTROLLER or BLOCK prepareLayout() method or EVENT OBSERVER*/
     if (Mage::registry('diehard')) { // Prevent errors in absence of Cm_Diehard module
         if ($this->getSession()->getSomeVariable()) {
@@ -241,6 +270,7 @@ or an event observer.
             Mage::registry('diehard')->addIgnoredBlock($this);
         }
     }
+```
 
 ## Default Ignored Blocks
 
@@ -254,15 +284,19 @@ helper method.
 
 The easiest to maintain method may be in the layout.
 
-    <!-- LAYOUT -->
+```xml
+<!-- LAYOUT -->
     <reference name="greeting">
         <action method="addDefaultIgnored" />
     </reference>
+```
 
 ### Helper
 
-    <!-- Event Observer, constructor or other -->
+```php
+    /* Event Observer, constructor or other */
     Mage::helper('diehard')->addDefaultIgnoredBlock('greeting');
+```
 
 In both examples the "greeting" block will be ignored by default for all users until it is explicitly removed
 from the ignored blocks list.

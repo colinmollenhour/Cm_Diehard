@@ -48,7 +48,7 @@ class Cm_Diehard_LoadController extends Mage_Core_Controller_Front_Action
         // Render all blocks contents
         if ($this->getRequest()->getParam('all_blocks')) {
             foreach ($this->getLayout()->getAllBlocks() as $block) { /* @var $block Mage_Core_Block_Abstract */
-                $htmlId = $block->getDiehardHtmlId();
+                $htmlId = $block->getDiehardSelector();
                 $response['blocks'][$htmlId] = $block->toHtml();
             }
         }

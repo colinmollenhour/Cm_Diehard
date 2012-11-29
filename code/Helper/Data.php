@@ -162,6 +162,9 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     public function getIgnoredBlocks()
     {
         $ignoredBlocks = Mage::getSingleton('core/cookie')->get(self::COOKIE_IGNORED_BLOCKS);
+        if ($ignoredBlocks == '-') {
+          return array();
+        }
         return ($ignoredBlocks === NULL ? NULL : explode(',', $ignoredBlocks));
     }
 
@@ -173,7 +176,12 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function setIgnoredBlocks($ignoredBlocks)
     {
-        $ignoredBlocks = implode(',', $ignoredBlocks);
+        $ignoredBlocks = array_filter($ignoredBlocks);
+        if ($ignoredBlocks) {
+          $ignoredBlocks = implode(',', $ignoredBlocks);
+        } else {
+          $ignoredBlocks = '-';
+        }
         Mage::getSingleton('core/cookie')->set(self::COOKIE_IGNORED_BLOCKS, $ignoredBlocks);
     }
 

@@ -751,9 +751,9 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
         // if setBlockIsDynamic and setSuppressOutput then we automatically render only a placeholder tag.
         if ($this->getBlockIsDynamic() && Mage::registry('diehard_lifetime')) {
           if ($this->getSuppressOutput()) {
-            return '<div id="'.$this->getDiehardHtmlId().'"></div>';
+            return '<div id="'.substr($this->getDiehardSelector(),1).'"></div>';
           } else if (FALSE /* TODO - backend uses inline replacement */) {
-            return '<!-- DIEHARD_BLOCK|'.$this->getDiehardHtmlId().'|'.json_encode($this->getCacheKeyInfo()).' -->';
+            return '<!-- DIEHARD_BLOCK|'.$this->getDiehardSelector().'|'.json_encode($this->getCacheKeyInfo()).' -->';
           }
         }
         /* END: Added by Cm_Diehard */
@@ -1228,23 +1228,23 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
      */
 
     /**
-     * @param string $htmlId
+     * @param string $selector
      * @return Mage_Core_Block_Abstract
      */
-    public function setBlockIsDynamic($htmlId = '')
+    public function setBlockIsDynamic($selector = '')
     {
         // Generic rendering mode
         if (Mage::registry('diehard_lifetime')) {
-            if ( ! $htmlId) {
-                $htmlId = $this->getDiehardHtmlId();
-                $this->setFrameTags('div id="'.$htmlId."'", 'div');
+            if ( ! $selector) {
+                $selector = $this->getDiehardSelector();
+                $this->setFrameTags('div id="'.substr($selector,1).'"', 'div');
             }
             $helper = Mage::helper('diehard'); /* @var $helper Cm_Diehard_Helper_Data */
-            $helper->addDynamicBlock($htmlId, $this->getNameInLayout());
+            $helper->addDynamicBlock($selector, $this->getNameInLayout());
         }
         // Specific rendering mode
         else {
-            $this->setData('diehard_html_id', $htmlId ? $htmlId : $this->getDiehardHtmlId());
+            $this->setData('diehard_selector', $selector ? $selector : $this->getDiehardSelector());
         }
         return $this->setData('block_is_dynamic', TRUE);
     }
@@ -1253,12 +1253,12 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
      * Get or generate an html id for the replacement block
      * @return mixed|string
      */
-    public function getDiehardHtmlId()
+    public function getDiehardSelector()
     {
-        if ( ! $this->hasData('diehard_html_id')) {
-            return 'dh:'.preg_replace('/[^a-zA-Z0-9]+/', '_', $this->getNameInLayout());
+        if ( ! $this->hasData('diehard_selector')) {
+            return '#dh:'.preg_replace('/[^a-zA-Z0-9]+/', '_', $this->getNameInLayout());
         }
-        return $this->getData('diehard_html_id');
+        return $this->getData('diehard_selector');
     }
 
     /**
@@ -1273,36 +1273,36 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
     }
 
     /**
-     * @param string $namespace
-     * @param string $key
-     * @param bool|string $value
-     * @param null|string|array $block
-     * @return void
+     * @param array $args
      */
-    public function ignoreBlockIf($namespace, $key, $value = TRUE, $block = NULL)
+    public function ignoreBlockIf($args)
     {
-        $helper = Mage::helper('diehard'); /* @var $helper Cm_Diehard_Helper_Data */
-        if (Mage::getSingleton($namespace)->getDataUsingMethod($key) == $value) {
-            $helper->addIgnoredBlock($block ? $block : $this);
-        } else {
-            $helper->removeIgnoredBlock($block ? $block : $this);
-        }
+        return $this->ignoreBlockIf($args, FALSE);
     }
 
     /**
-     * @param string $namespace
-     * @param string $key
-     * @param bool|string $value
-     * @param null|string|array $block
-     * @return void
+     * @param array $args
+     * @param bool $ignore
      */
-    public function ignoreBlockUnless($namespace, $key, $value = TRUE, $block = NULL)
+    public function ignoreBlockUnless($args, $ignore = TRUE)
     {
+        if ( ! is_array($args)) {
+            $args = array($args);
+        }
         $helper = Mage::helper('diehard'); /* @var $helper Cm_Diehard_Helper_Data */
-        if (Mage::getSingleton($namespace)->getDataUsingMethod($key) != $value) {
-            $helper->addIgnoredBlock($block ? $block : $this);
+        $ignoreBlock = $ignore;
+        foreach ($args as $arg) {
+            if ( ! strpos($arg, '::')) continue;
+            list($namespace, $key) = explode('::', $arg, 2);
+            if (Mage::getSingleton($namespace)->getDataUsingMethod($key)) {
+                $ignoreBlock = !$ignore;
+                break;
+            }
+        }
+        if ($ignoreBlock) {
+            $helper->addIgnoredBlock($this);
         } else {
-            $helper->removeIgnoredBlock($block ? $block : $this);
+            $helper->removeIgnoredBlock($this);
         }
     }
 

@@ -18,7 +18,7 @@ Diehard.prototype =
         this.blocks = blocks;
     },
 
-    setDefaultIgnored: function(blocks) {
+    setDefaultIgnoredBlocks: function(blocks) {
         this.defaultIgnored = blocks;
     },
 
@@ -26,8 +26,9 @@ Diehard.prototype =
         // Remove ignored blocks
         var ignored = Mage.Cookies.get('diehard_ignored');
         if (ignored === null) { // No cookie means user has only hit cached pages thus far
-          // Use all default ignored blocks as ignored blocks
-          ignored = this.defaultIgnored;
+          ignored = this.defaultIgnored; // Use all default ignored blocks as ignored blocks
+        } else if (ignored == '-') { // '-' is a sentinel value for no blocks
+          ignored = [];
         } else { // Otherwise, if cookie is present then only ignore blocks that are in the cookie
           ignored = ignored.split(',');
         }
@@ -58,7 +59,7 @@ Diehard.prototype =
 };
 Diehard.replaceBlocks = function(data) {
     $H(data.blocks).each(function(block){
-        var el = $(block.key);
-        if(el) { el.replace(block.value); }
+        var matches = $$(block.key);
+        if(matches.length) { matches[0].replace(block.value); }
     });
 };

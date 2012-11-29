@@ -19,6 +19,7 @@
  *   <request_processors>
  *     <diehard>Cm_Diehard_Model_Backend_Magento</diehard>
  *   </request_processors>
+ *   <restrict_nocache>1</restrict_nocache> <!-- Set to 1 to serve cached response in spite of no-cache request header -->
  *   ...
  * </cache>
  *
@@ -27,6 +28,8 @@
  */
 class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
 {
+
+    const XML_PATH_RESTRICT_NOCACHE               = 'global/cache/restrict_nocache';
 
     protected $_name = 'Magento';
 
@@ -110,7 +113,15 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
      */
     public function extractContent($content)
     {
-        // TODO - canUse()?
+        if ( ! Mage::app()->useCache('diehard')) {
+            return FALSE;
+        }
+        if ( ! empty($_SERVER['HTTP_CACHE_CONTROL'])
+          && $_SERVER['HTTP_CACHE_CONTROL'] == 'no-cache'
+          && ! (int) Mage::app()->getConfig()->getNode(self::XML_PATH_RESTRICT_NOCACHE)
+        ) {
+            return FALSE;
+        }
         $cacheKey = $this->getCacheKey();
         if(Mage::app()->getCacheInstance()->getFrontend()->test(strtoupper($cacheKey))) {
             $this->setUseCachedResponse(TRUE);
