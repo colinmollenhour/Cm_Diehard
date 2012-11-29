@@ -93,7 +93,12 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getTags()
     {
-        return array_unique($this->_tags);
+        $tags = array_unique($this->_tags);
+        if ($tags) {
+            $ignoredTags = array_keys(Mage::app()->getConfig()->getNode(Mage::app()->getLayout()->getArea().'/diehard/ignored_tags')->asCanonicalArray());
+            $tags = array_diff($tags, $ignoredTags);
+        }
+        return $tags;
     }
 
     /**

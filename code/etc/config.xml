@@ -143,6 +143,12 @@
                 <catalog_product_view>86400</catalog_product_view>
                 -->
             </actions>
+
+            <!-- Tags that will be excluded from being used for tagging pages -->
+            <ignored_tags>
+                <block_html/>
+            </ignored_tags>
+
         </diehard>
     </frontend>
 

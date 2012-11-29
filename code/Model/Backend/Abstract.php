@@ -14,7 +14,7 @@ abstract class Cm_Diehard_Model_Backend_Abstract
 
     protected $_name = '';
 
-    protected $_cacheKey;
+    protected static $_cacheKey;
 
     /**
      * If true, the backend supports Ajax dynamic block replacement (should be all)
@@ -52,8 +52,8 @@ abstract class Cm_Diehard_Model_Backend_Abstract
      */
     public function getCacheKey()
     {
-        if( ! $this->_cacheKey) {
-            $this->_cacheKey = implode('_', array(
+        if( ! self::$_cacheKey) {
+            self::$_cacheKey = strtoupper(implode('_', array(
                 'DIEHARD',
                 $this->_name,
                 // Mage::app()->getStore()->getId(), // Can't be used before init
@@ -62,9 +62,9 @@ abstract class Cm_Diehard_Model_Backend_Abstract
                 Mage::app()->getRequest()->getRequestUri(),
                 Mage::app()->getRequest()->getCookie(Cm_Diehard_Helper_Data::COOKIE_CACHE_KEY_DATA, '')
                 // Design?
-            ));
+            )));
         }
-        return $this->_cacheKey;
+        return self::$_cacheKey;
     }
 
     /**

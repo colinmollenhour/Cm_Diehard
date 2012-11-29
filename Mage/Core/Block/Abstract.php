@@ -1204,18 +1204,19 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
      */
     protected function _saveCache($data)
     {
-        if (is_null($this->getCacheLifetime()) || !Mage::app()->useCache(self::CACHE_GROUP)) {
-            return false;
-        }
-
         /* START: Changed by Cm_Diehard */
         // Add block cache tags to diehard tags
         $tags = $this->getCacheTags();
         if(Mage::helper('diehard')->getLifetime()) {
             Mage::helper('diehard')->addTags($tags);
         }
-        Mage::app()->saveCache($data, $this->getCacheKey(), $tags, $this->getCacheLifetime());
         /* END: Changed by Cm_Diehard */
+
+        if (is_null($this->getCacheLifetime()) || !Mage::app()->useCache(self::CACHE_GROUP)) {
+            return false;
+        }
+
+        Mage::app()->saveCache($data, $this->getCacheKey(), $tags, $this->getCacheLifetime());
         return $this;
     }
 
@@ -1353,6 +1354,40 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
     {
         $helper = Mage::helper('diehard'); /* @var $helper Cm_Diehard_Helper_Data */
         $helper->addDefaultIgnoredBlock($this);
+    }
+
+  /**
+   * Add cache tags from a model as tags for the page.
+   * Supports three types:
+   *
+   *  - data: $block->getData($key)
+   *  - singleton: Mage::getSingleton($key)
+   *  - registry: Mage::registry($key)
+   *
+   * @param $type
+   * @param $key
+   */
+  public function addCacheTagsFromModel($type, $key)
+    {
+        switch($type) {
+            case 'data':
+                $model = $this->getData($key);
+                break;
+            case 'singleton':
+                $model = Mage::getSingleton($key);
+                break;
+            case 'registry':
+                $model = Mage::registry($key);
+                break;
+            default:
+                Mage::throwException('Unrecognized argument: '.$type);
+        }
+        if ($model && $model instanceof Mage_Core_Model_Abstract && $model->getId()) {
+            if ($tags = $model->getCacheIdTags()) {
+                $helper = Mage::helper('diehard'); /* @var $helper Cm_Diehard_Helper_Data */
+                $helper->addTags($tags);
+            }
+        }
     }
 
 }

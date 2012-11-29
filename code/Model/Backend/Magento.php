@@ -123,7 +123,7 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             return FALSE;
         }
         $cacheKey = $this->getCacheKey();
-        if(Mage::app()->getCacheInstance()->getFrontend()->test(strtoupper($cacheKey))) {
+        if(Mage::app()->getCacheInstance()->getFrontend()->test($cacheKey)) {
             $this->setUseCachedResponse(TRUE);
 
             // Allow external code to cancel the sending of a cached response
