@@ -45,7 +45,7 @@ class Cm_Diehard_Model_Observer
     {
         if($this->helper()->isEnabled()) {
             $response = $observer->getResponse(); /* @var $response Mage_Core_Controller_Response_Http */
-            $request = Mage::app()->getRequest();
+            $fullActionName = $this->helper()->getFullActionName();
             $lifetime = $this->helper()->getLifetime();
 
             if($lifetime) {
@@ -66,12 +66,15 @@ class Cm_Diehard_Model_Observer
 
             // Add debug data
             if($this->helper()->isDebug()) {
-                $fullActionName = $request->getModuleName().'_'.$request->getControllerName().'_'.$request->getActionName();
                 $response->setHeader('X-Diehard', "$fullActionName-$lifetime", true);
                 $response->setHeader('X-Diehard-Tags', implode('|', $this->helper()->getTags()), true);
                 $response->setHeader('X-Diehard-AddedIgnoredBlocks', implode('|',$addedIgnored), true);
                 $response->setHeader('X-Diehard-RemovedIgnoredBlocks', implode('|',$removedIgnored), true);
             }
+
+            // Log miss to counter
+            $counter = new Cm_Diehard_Helper_Counter;
+            $counter->logRequest($fullActionName, FALSE);
         }
     }
 

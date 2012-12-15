@@ -88,15 +88,17 @@ class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Backend_Abs
         // Use existing cache data if it exists in case there are multiple upstream proxies
         // If a record exists then any content generated at the time the record was is assumed to not be stale
         if ( ! ($cacheData = Mage::app()->loadCache($cacheKey))) {
+            $fullActionName = $this->helper()->getFullActionName();
             if($useEtags) {
-                $cacheData = sha1(microtime().mt_rand());
+                $cacheData = $fullActionName.':'.sha1(microtime().mt_rand());
             } else {
-                $cacheData = $this->_rfc1123Date();
+                $cacheData = $fullActionName.':'.$this->_rfc1123Date();
             }
             $tags = $this->helper()->getTags();
             $tags[] = Cm_Diehard_Helper_Data::CACHE_TAG;
             Mage::app()->saveCache($cacheData, $cacheKey, $tags, $lifetime);
         }
+        list($fullActionName, $cacheData) = explode(':', $cacheData, 2);
 
         // Set headers so the page is cached with the ETag/Last-Modified value for invalidation
         $cacheControl = sprintf(Mage::getStoreConfig('system/diehard/cachecontrol'), $lifetime);
@@ -120,31 +122,43 @@ class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Backend_Abs
      */
     public function extractContent($content)
     {
+        $hit = FALSE;
+
         // Use ETags if given
         if(
              ($ifNoneMatch = Mage::app()->getRequest()->getHeader('If-None-Match'))
-          && ($etag = Mage::app()->loadCache($this->getCacheKey()))
-          && preg_match('|(?:W/)?"'.$etag.'"|', $ifNoneMatch)
+          && ($cacheData = Mage::app()->loadCache($this->getCacheKey()))
         ) {
-            // Client's cached content is valid, we're all done here!
-            Mage::app()->getResponse()->setHttpResponseCode(304);
-            Mage::app()->getResponse()->setHeader('ETag', 'W/"'.$etag.'"', true);
-            return TRUE;
+            list($fullActionName, $etag) = explode(':', $cacheData, 2);
+            if (preg_match('|(?:W/)?"'.$etag.'"|', $ifNoneMatch)) {
+                // Client's cached content is valid, we're all done here!
+                Mage::app()->getResponse()->setHttpResponseCode(304);
+                Mage::app()->getResponse()->setHeader('ETag', 'W/"'.$etag.'"', true);
+                $hit = TRUE;
+            }
         }
 
         // Fall-back to Last-Modified if given
-        if(
+        else if(
              ($ifModifiedSince = Mage::app()->getRequest()->getHeader('If-Modified-Since'))
-          && ($lastModified = Mage::app()->loadCache($this->getCacheKey()))
-          && $lastModified == $ifModifiedSince
+          && ($cacheData = Mage::app()->loadCache($this->getCacheKey()))
         ) {
-            // Client's cached content is valid, we're all done here!
-            Mage::app()->getResponse()->setHttpResponseCode(304);
-            Mage::app()->getResponse()->setHeader('Last-Modified', $this->_rfc1123Date(), true);
-            return TRUE;
+            list($fullActionName, $lastModified) = explode(':', $cacheData, 2);
+            if ($lastModified == $ifModifiedSince) {
+                // Client's cached content is valid, we're all done here!
+                Mage::app()->getResponse()->setHttpResponseCode(304);
+                Mage::app()->getResponse()->setHeader('Last-Modified', $this->_rfc1123Date(), true);
+                $hit = TRUE;
+            }
         }
 
-        return FALSE;
+        // Log a hit - misses are logged in httpResponseSendBefore
+        if ($hit) {
+            $counter = new Cm_Diehard_Helper_Counter;
+            $counter->logRequest($fullActionName, TRUE);
+        }
+
+        return $hit;
     }
 
     /**

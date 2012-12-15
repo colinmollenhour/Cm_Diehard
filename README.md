@@ -301,6 +301,34 @@ The easiest to maintain method may be in the layout.
 In both examples the "greeting" block will be ignored by default for all users until it is explicitly removed
 from the ignored blocks list.
 
+## Hit Rate Monitor
+
+Redis can be used for monitoring the hit-rate of the cache on the revalidate backend and the Magento backend.
+To enable this feature you must have Credis_Client present in your lib directory:
+
+    git clone git://github.com/colinmollenhour/credis.git lib/Credis
+
+Then setup your configuration in app/etc/local.xml:
+
+```
+<!-- CONFIG -->
+  <global>
+    ...
+    <diehard>
+      <counter>
+        <enabled>1</enabled>
+        <server>tcp://127.0.0.1:6379/diehard</server>
+        <db>0</db>
+        <full_action_name>1</full_action_name>
+      </counter>
+    </diehard>
+    ...
+  </global>
+```
+
+The above configuration example enables hit and miss counters to be updated on every request to the
+specified Redis server. Use the included munin script to monitor these values with munin. (TODO)
+
 ## License
 
 This module is distributed under the GPLv3 license. To receive a copy

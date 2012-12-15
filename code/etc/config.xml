@@ -79,6 +79,16 @@
                 </jquery>
                 -->
             </jslibs>
+
+            <!-- Enable in app/etc/local.xml -->
+            <counter>
+              <!-- Example:
+              <server>tcp://127.0.0.1:6379/diehard</server>
+              <db>0</db>
+              <enabled>0</enabled>
+              <full_action_name>1</full_action_name>
+              -->
+            </counter>
         </diehard>
     </global>
 
