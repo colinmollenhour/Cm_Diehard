@@ -16,12 +16,11 @@
  * Cons:
  *   - Every request will still hit PHP, but the cache hit will be much more efficient than a miss.
  *
- * Reverse-proxy servers that support revalidation:
- *   - Squid (ETag w/ Vary supported)
- *   - Nginx (No ETag support)
- *   - Apache (ETag support buggy, possibly fixed in 2.4)
- *   - Varnish (Possible ETag support in 2.0.5)
- *   - Apache TrafficServer (ETag supported, unknown to what degree)
+ * Reverse-proxy servers:
+ *   - Squid (IMS: Yes, INM: NO)
+ *   - Nginx (IMS: Yes, INM: Partial)
+ *   - Apache (IMS: Yes, INM: buggy, possibly fixed in 2.4)
+ *   - Varnish (IMS: Yes, INM: No (experimental-ims branch for 3.x series maybe)
  *
  * Third-party services that definitely support revalidation:
  *   - Cloudfront
