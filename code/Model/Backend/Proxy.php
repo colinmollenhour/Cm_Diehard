@@ -10,7 +10,7 @@ class Cm_Diehard_Model_Backend_Proxy extends Cm_Diehard_Model_Backend_Abstract
 {
 
     const CACHE_TAG = 'DIEHARD_URLS';
-    const PREFIX_TAG = 'DIEHARD_URLS_';
+    const PREFIX_TAG = 'DHU_';
     const PREFIX_KEY = 'URL_';
 
     protected $_name = 'Proxy';
@@ -51,11 +51,15 @@ class Cm_Diehard_Model_Backend_Proxy extends Cm_Diehard_Model_Backend_Abstract
     public function httpResponseSendBefore(Mage_Core_Controller_Response_Http $response, $lifetime)
     {
         // Cache the url with all of the related tags (prefixed)
-        $url = $this->helper()->getCurrentUrl();
         $cacheKey = $this->getCacheKey();
-        $tags = $this->_getCacheTags($this->helper()->getTags());
-        $tags[] = self::CACHE_TAG;
-        Mage::app()->saveCache($url, self::PREFIX_KEY.$cacheKey, $tags, $lifetime);
+        if ($lastModified = Mage::app()->getCacheInstance()->getFrontend()->test($cacheKey)) {
+          // TODO - touch cache record?
+        } else {
+          $url = Mage::app()->getRequest()->getScheme().'://'.$_SERVER['HTTP_HOST'].Mage::app()->getRequest()->getRequestUri();
+          $tags = $this->_getCacheTags($this->helper()->getTags());
+          $tags[] = self::CACHE_TAG;
+          Mage::app()->saveCache($url, self::PREFIX_KEY.$cacheKey, $tags, $lifetime);
+        }
 
         // Set a header so the page is cached
         $cacheControl = sprintf(Mage::getStoreConfig('system/diehard/cachecontrol'), $lifetime);
@@ -72,7 +76,7 @@ class Cm_Diehard_Model_Backend_Proxy extends Cm_Diehard_Model_Backend_Abstract
     {
         $saveTags = array();
         foreach($tags as $tag) {
-            $saveTags[] = self::PREFIX_TAG.$tag;
+            $saveTags[] = self::PREFIX_TAG.strtoupper($tag);
         }
         return $saveTags;
     }
@@ -85,26 +89,34 @@ class Cm_Diehard_Model_Backend_Proxy extends Cm_Diehard_Model_Backend_Abstract
      */
     protected function _cleanCache($tags)
     {
-        // Get all urls related to the tags being cleaned
-        $ids = Mage::app()->getCache()->getBackend()->getIdsMatchingAnyTags($tags);
-        $urls = array();
-        foreach($ids as $id) {
-            if($url = Mage::app()->loadCache($id)) {
+        if ($tags) {
+            // Get all urls related to the tags being cleaned
+            $prefix = Mage::app()->getCache()->getOption('cache_id_prefix');
+            foreach($tags as $key => $value) {
+              $tags[$key] = $prefix.$value;
+            }
+            $ids = Mage::app()->getCache()->getIdsMatchingAnyTags($tags);
+            $urls = array();
+            foreach($ids as $id) {
+              if($url = Mage::app()->loadCache($id)) {
                 $urls[] = $url;
+              }
+            }
+
+            // Clean up the cache
+            Mage::app()->getCache()->clean(Zend_Cache::CLEANING_MODE_MATCHING_ANY_TAG, $tags);
+
+            // Dump urls to file
+            if ($urls) {
+                $dir = Mage::getBaseDir('var').DS.'diehard'.DS.'proxy';
+                if( ! is_dir($dir)) {
+                    if( ! mkdir($dir, 0770, TRUE)) {
+                        Mage::log('Could not create diehard directory: '.$dir, Zend_Log::CRIT);
+                    }
+                }
+                file_put_contents($dir.DS.microtime(), implode("\n", $urls));
             }
         }
-
-        // Clean up the cache
-        Mage::app()->getCache()->clean(Zend_Cache::CLEANING_MODE_MATCHING_ANY_TAG, $tags);
-
-        // Dump urls to file
-        $dir = Mage::getBaseDir('var').DS.'diehard'.DS.'proxy';
-        if( ! is_dir($dir)) {
-            if( ! mkdir($dir, 770, TRUE)) {
-                Mage::log('Could not create diehard directory: '.$dir, Zend_Log::CRIT);
-            }
-        }
-        file_put_contents($dir.DS.sha1(microtime()), implode("\n", $urls));
     }
 
 }

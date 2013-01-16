@@ -72,7 +72,7 @@ class Cm_Diehard_Model_Observer
 
             // Add debug data
             if($this->helper()->isDebug()) {
-                $response->setHeader('X-Diehard', "$fullActionName-$lifetime", true);
+                $response->setHeader('X-Diehard', "{$this->helper()->getBackend()->getName()}-$fullActionName-$lifetime", true);
                 $response->setHeader('X-Diehard-Tags', implode('|', $this->helper()->getTags()), true);
                 $response->setHeader('X-Diehard-Blocks-Added', implode('|',$addedIgnored), true);
                 $response->setHeader('X-Diehard-Blocks-Removed', implode('|',$removedIgnored), true);

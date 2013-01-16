@@ -100,6 +100,7 @@ class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Backend_Abs
         list($fullActionName, $cacheData) = explode(':', $cacheData, 2);
 
         // Set headers so the page is cached with the ETag/Last-Modified value for invalidation
+        session_cache_limiter('');
         $cacheControl = sprintf(Mage::getStoreConfig('system/diehard/cachecontrol'), $lifetime);
         $response->setHeader('Cache-Control', $cacheControl, true);
         $response->setHeader('Expires', $this->_rfc1123Date(time() + $lifetime), true);
