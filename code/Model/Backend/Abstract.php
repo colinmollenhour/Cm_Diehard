@@ -46,6 +46,14 @@ abstract class Cm_Diehard_Model_Backend_Abstract
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->_name;
+    }
+
+    /**
      * Set lazily and only once
      *
      * @return string

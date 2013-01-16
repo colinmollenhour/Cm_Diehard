@@ -46,9 +46,15 @@ class Cm_Diehard_Model_Observer
         if($this->helper()->isEnabled()) {
             $response = $observer->getResponse(); /* @var $response Mage_Core_Controller_Response_Http */
             $fullActionName = $this->helper()->getFullActionName();
-            $lifetime = $this->helper()->getLifetime();
 
-            if($lifetime) {
+            Mage::dispatchEvent('diehard_response_send_before_'.strtolower($this->helper()->getBackend()->getName()), array(
+              'response' => $response,
+              'full_action_name' => $fullActionName,
+              'lifetime' => $this->helper()->getLifetime(),
+            ));
+
+            $lifetime = $this->helper()->getLifetime();
+            if($lifetime !== FALSE) { // 0 lifetime allowed (e.g. max-age=0)
                 // Allow backend to take action on responses that are to be cached
                 $this->helper()->getBackend()->httpResponseSendBefore($response, $lifetime);
             }
@@ -68,8 +74,8 @@ class Cm_Diehard_Model_Observer
             if($this->helper()->isDebug()) {
                 $response->setHeader('X-Diehard', "$fullActionName-$lifetime", true);
                 $response->setHeader('X-Diehard-Tags', implode('|', $this->helper()->getTags()), true);
-                $response->setHeader('X-Diehard-AddedIgnoredBlocks', implode('|',$addedIgnored), true);
-                $response->setHeader('X-Diehard-RemovedIgnoredBlocks', implode('|',$removedIgnored), true);
+                $response->setHeader('X-Diehard-Blocks-Added', implode('|',$addedIgnored), true);
+                $response->setHeader('X-Diehard-Blocks-Removed', implode('|',$removedIgnored), true);
             }
 
             // Log miss to counter
