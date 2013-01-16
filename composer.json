@@ -1,5 +1,5 @@
 {
-    "name":"colinmollenhour/Cm_Diehard",
+    "name":"colinmollenhour/cm_diehard",
     "type":"magento-module",
     "license":"GPL-3.0",
     "homepage":"https://github.com/colinmollenhour/Cm_Diehard",
@@ -10,6 +10,6 @@
         }
     ],
     "require":{
-        "magento-hackathon/magento-composer-installer":"dev-master"
+        "magento-hackathon/magento-composer-installer":"*"
     }
 }
