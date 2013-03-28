@@ -1257,7 +1257,7 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
     public function getDiehardSelector()
     {
         if ( ! $this->hasData('diehard_selector')) {
-            return '#dh:'.preg_replace('/[^a-zA-Z0-9]+/', '_', $this->getNameInLayout());
+            return '#dh_'.preg_replace('/[^a-zA-Z0-9]+/', '_', $this->getNameInLayout());
         }
         return $this->getData('diehard_selector');
     }

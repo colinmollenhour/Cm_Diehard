@@ -22,6 +22,9 @@ class Cm_Diehard_Model_Observer
      */
     public function controllerActionPredispatch(Varien_Event_Observer $observer)
     {
+        if (Mage::registry('diehard')) {
+            return;
+        }
         Mage::register('diehard', $this->helper());
         if ($this->helper()->isEnabled() && Mage::app()->getRequest()->isGet())
         {
