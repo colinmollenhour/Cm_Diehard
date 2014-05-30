@@ -193,9 +193,7 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             }
 
             // Create a subrequest to get JSON response
-            $scheme = Mage::app()->getRequest()->getScheme();
-            $host = Mage::helper('core/http')->getHttpHost();
-            $uri = sprintf('%s://%s/_diehard/load/json', $scheme, $host);
+            $uri = $this->getBaseUrl() . '_diehard/load/ajax';
             $request = new Mage_Core_Controller_Request_Http($uri);
             $request->setModuleName('_diehard');
             $request->setControllerName('load');

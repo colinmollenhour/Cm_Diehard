@@ -55,7 +55,7 @@ class Cm_Diehard_Model_Backend_Proxy extends Cm_Diehard_Model_Backend_Abstract
         if ($lastModified = Mage::app()->getCacheInstance()->getFrontend()->test($cacheKey)) {
           // TODO - touch cache record?
         } else {
-          $url = Mage::app()->getRequest()->getScheme().'://'.$_SERVER['HTTP_HOST'].Mage::app()->getRequest()->getRequestUri();
+          $url = $this->getBaseUrl().Mage::app()->getRequest()->getRequestUri();
           $tags = $this->_getCacheTags($this->helper()->getTags());
           $tags[] = self::CACHE_TAG;
           Mage::app()->saveCache($url, self::PREFIX_KEY.$cacheKey, $tags, $lifetime);
