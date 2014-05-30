@@ -207,6 +207,7 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
                 $request->setParam('blocks', $params['blocks']);
             }
             $request->setParam('params', $params['params']);
+            $request->setDispatched(true);
             $response = new Mage_Core_Controller_Response_Http;
             require_once Mage::getModuleDir('controllers', 'Cm_Diehard') . '/LoadController.php';
             $controller = new Cm_Diehard_LoadController($request, $response);
