@@ -179,7 +179,7 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
         if($params['blocks'] || ! empty($params['all_blocks']))
         {
             // Init store if it has not been yet (page served from cache)
-            if( ! Mage::app()->getFrontController()->getData('action')) {
+            if(! Mage::app()->getStores()) {
                 $appParams = Mage::registry('application_params');
                 Mage::app()->init($appParams['scope_code'], $appParams['scope_type'], $appParams['options']);
             }
