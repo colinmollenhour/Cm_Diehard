@@ -104,7 +104,10 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $tags = array_unique($this->_tags);
         if ($tags) {
-            $ignoredTags = array_keys(Mage::app()->getConfig()->getNode(Mage::app()->getLayout()->getArea().'/diehard/ignored_tags')->asCanonicalArray());
+            $path = Mage::app()->getLayout()->getArea().'/diehard/ignored_tags';
+            $ignoredTags = array_keys(
+                Mage::app()->getConfig()->getNode($path)->asCanonicalArray()
+            );
             $tags = array_diff($tags, $ignoredTags);
         }
         return $tags;
@@ -276,7 +279,9 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isCacheableAction($fullActionName)
     {
-        $lifeTime = Mage::app()->getConfig()->getNode(Mage::app()->getLayout()->getArea().'/diehard/actions/'.$fullActionName);
+        $area = Mage::app()->getLayout()->getArea();
+        $path = $area . '/diehard/actions/' . $fullActionName;
+        $lifeTime = Mage::app()->getConfig()->getNode($path);
         if($lifeTime) {
             return intval($lifeTime);
         }
