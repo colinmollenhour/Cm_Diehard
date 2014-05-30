@@ -29,7 +29,7 @@
 class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
 {
 
-    const XML_PATH_RESTRICT_NOCACHE               = 'global/cache/restrict_nocache';
+    const XML_PATH_RESTRICT_NOCACHE = 'global/cache/restrict_nocache';
 
     protected $_name = 'Magento';
 
@@ -219,5 +219,4 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             return '';
         }
     }
-
 }
