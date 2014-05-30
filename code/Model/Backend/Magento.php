@@ -215,7 +215,6 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             // Disable cache, render replacement blocks and re-enable
             $oldLifetime = $this->helper()->getLifetime();
             $this->helper()->setLifetime(FALSE);
-            $controller->preDispatch();
             $controller->dispatch('json');
             $this->helper()->setLifetime($oldLifetime);
 
