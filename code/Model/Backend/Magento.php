@@ -211,12 +211,7 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             $response = new Mage_Core_Controller_Response_Http;
             require_once Mage::getModuleDir('controllers', 'Cm_Diehard') . '/LoadController.php';
             $controller = new Cm_Diehard_LoadController($request, $response);
-
-            // Disable cache, render replacement blocks and re-enable
-            $oldLifetime = $this->helper()->getLifetime();
-            $this->helper()->setLifetime(FALSE);
             $controller->dispatch('json');
-            $this->helper()->setLifetime($oldLifetime);
 
             return "<script type=\"text/javascript\">Diehard.replaceBlocks({$response->getBody()});</script>";
         }
