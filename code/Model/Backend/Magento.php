@@ -38,7 +38,7 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
     protected $_useEsi  = TRUE;
     protected $_useJs   = TRUE;
 
-    protected $_useCachedResponse = NULL;
+    protected static $_useCachedResponse = NULL;
 
     /**
      * Clear all cached pages
@@ -87,14 +87,15 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
     }
 
     /**
-     * Observers of the `diehard_use_cached_response` event may use this to disallow sending of
-     * a cached response for any given request.
+     * Flag to avoid caching the response if it was just pulled from the cache.
+     * Also, observers of the `diehard_use_cached_response` event may use this 
+     * to disallow sending of a cached response for any given request.
      *
      * @param bool $flag
      */
     public function setUseCachedResponse($flag)
     {
-        $this->_useCachedResponse = $flag;
+        self::$_useCachedResponse = $flag;
     }
 
     /**
@@ -102,7 +103,7 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
      */
     public function getUseCachedResponse()
     {
-        return $this->_useCachedResponse;
+        return self::$_useCachedResponse;
     }
 
     /**
