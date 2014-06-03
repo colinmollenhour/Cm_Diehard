@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2011 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -31,7 +31,7 @@
  * @category   Mage
  * @package    Mage_Core
  * @author      Magento Core Team <core@magentocommerce.com>
- *
+ * 
  * @method string getCacheFriendlyTemplate()
  * @method Mage_Core_Block_Template setCacheFriendlyTemplate(string $file)
  */
@@ -103,7 +103,7 @@ class Mage_Core_Block_Template extends Mage_Core_Block_Abstract
     public function getTemplate()
     {
         if ($this->getBlockIsDynamic() && Mage::registry('diehard_lifetime') && $this->getCacheFriendlyTemplate()) {
-          return $this->getCacheFriendlyTemplate();
+            return $this->getCacheFriendlyTemplate();
         }
         return $this->_template;
     }
@@ -242,14 +242,6 @@ HTML;
         }
 
         try {
-            include $this->_viewDir . DS . $fileName;
-        } catch (Exception $e) {
-            ob_get_clean();
-            throw $e;
-        }
-
-        /* 
-        try {
             $includeFilePath = realpath($this->_viewDir . DS . $fileName);
             if (strpos($includeFilePath, realpath($this->_viewDir)) === 0 || $this->_getAllowSymlinks()) {
                 include $includeFilePath;
@@ -261,7 +253,6 @@ HTML;
             ob_get_clean();
             throw $e;
         }
-        */
 
         if ($this->getShowTemplateHints()) {
             echo '</div>';

@@ -4,4 +4,5 @@ frontend/template/                app/design/frontend/base/default/template/dieh
 js/*                              js/diehard/
 Cm_Diehard.xml                    app/etc/modules/Cm_Diehard.xml
 Mage/Core/Block/Abstract.php      app/code/community/Mage/Core/Block/Abstract.php
+Mage/Core/Block/Template.php      app/code/community/Mage/Core/Block/Template.php
 Mage/Diehard/Helper/Data.php      app/code/community/Mage/Diehard/Helper/Data.php

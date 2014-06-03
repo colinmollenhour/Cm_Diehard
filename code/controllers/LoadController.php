@@ -45,11 +45,15 @@ class Cm_Diehard_LoadController extends Mage_Core_Controller_Front_Action
         $this->loadLayout($handles);
         $layout = $this->getLayout();
 
+        $ignoredBlocks = (array) $helper->getIgnoredBlocks();
+        
         // Render all blocks contents
         if ($this->getRequest()->getParam('all_blocks')) {
             foreach ($this->getLayout()->getAllBlocks() as $block) { /* @var $block Mage_Core_Block_Abstract */
-                $selector = $block->getDiehardSelector();
-                $response['blocks'][$selector] = $block->toHtml();
+            if (! in_array($block->getNameInLayout(), $ignoredBlocks)) {
+                    $selector = $block->getDiehardSelector();
+                    $response['blocks'][$selector] = $block->toHtml();
+                }
             }
         }
 
@@ -57,11 +61,13 @@ class Cm_Diehard_LoadController extends Mage_Core_Controller_Front_Action
         else {
             $requestedBlockNames = $this->getRequest()->getParam('blocks', array());
             foreach ($requestedBlockNames as $selector => $requestedBlockName) {
-                $tmpBlock = $layout->getBlock($requestedBlockName);
-                if ($tmpBlock) {
-                    $response['blocks'][$selector] = $tmpBlock->toHtml();
-                } else {
-                    $response['blocks'][$selector] = '<!-- BLOCK NOT FOUND -->';
+                if (! in_array($requestedBlockName, $ignoredBlocks)) {
+                    $tmpBlock = $layout->getBlock($requestedBlockName);
+                    if ($tmpBlock) {
+                        $response['blocks'][$selector] = $tmpBlock->toHtml();
+                    } else {
+                        $response['blocks'][$selector] = '<!-- BLOCK NOT FOUND -->';
+                    }
                 }
             }
         }

@@ -147,6 +147,17 @@ abstract class Cm_Diehard_Model_Backend_Abstract
         return preg_replace('|<!-- ###DIEHARD:(.+)### -->|', $replace, $body, 1);
     }
 
+    /**
+     * @return string
+     */
+    public function getBaseUrl()
+    {
+        $scheme = Mage::app()->getRequest()->getScheme();
+        $host = $_SERVER['HTTP_HOST'];
+        $uri = $scheme . '://' . $host;
+        return $uri;
+    }
+
     abstract public function flush();
 
     abstract public function cleanCache($tags);

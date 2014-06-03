@@ -47,7 +47,7 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
     protected $_useEsi  = TRUE;
     protected $_useJs   = TRUE;
 
-    protected $_useCachedResponse = NULL;
+    protected static $_useCachedResponse = NULL;
     protected $_cache;
 
     protected $_defaultBackendOptions = array(
@@ -110,14 +110,15 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
     }
 
     /**
-     * Observers of the `diehard_use_cached_response` event may use this to disallow sending of
-     * a cached response for any given request.
+     * Flag to avoid caching the response if it was just pulled from the cache.
+     * Also, observers of the `diehard_use_cached_response` event may use this 
+     * to disallow sending of a cached response for any given request.
      *
      * @param bool $flag
      */
     public function setUseCachedResponse($flag)
     {
-        $this->_useCachedResponse = $flag;
+        self::$_useCachedResponse = $flag;
     }
 
     /**
@@ -125,7 +126,7 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
      */
     public function getUseCachedResponse()
     {
-        return $this->_useCachedResponse;
+        return self::$_useCachedResponse;
     }
 
     /**
@@ -160,7 +161,6 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
                 if ($body = $this->_getCacheInstance()->load($cacheKey)) {
                     // Inject dynamic content replacement at end of body
                     $body = $this->injectDynamicBlocks($body);
-                    Mage::app()->getResponse()->setHeader('X-Diehard', 'HIT');
                     $counter = new Cm_Diehard_Helper_Counter;
                     $counter->logRequest(FALSE, TRUE); // TODO - retrieve fullActionName
                     return $body;
@@ -202,7 +202,7 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
         if($params['blocks'] || ! empty($params['all_blocks']))
         {
             // Init store if it has not been yet (page served from cache)
-            if( ! Mage::app()->getFrontController()->getData('action')) {
+            if(! Mage::app()->getStores()) {
                 $appParams = Mage::registry('application_params');
                 Mage::app()->init($appParams['scope_code'], $appParams['scope_type'], $appParams['options']);
             }
@@ -216,7 +216,9 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
             }
 
             // Create a subrequest to get JSON response
-            $request = new Mage_Core_Controller_Request_Http('_diehard/load/json');
+            $uri = $this->getBaseUrl() . '/_diehard/load/ajax';
+            $request = new Mage_Core_Controller_Request_Http($uri);
+            $request->setRouteName('diehard');
             $request->setModuleName('_diehard');
             $request->setControllerName('load');
             $request->setActionName('ajax');
@@ -228,17 +230,13 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
                 $request->setParam('blocks', $params['blocks']);
             }
             $request->setParam('params', $params['params']);
+            $request->setDispatched(true);
             $response = new Mage_Core_Controller_Response_Http;
+            require_once Mage::getModuleDir('controllers', 'Cm_Diehard') . '/LoadController.php';
             $controller = new Cm_Diehard_LoadController($request, $response);
-
-            // Disable cache, render replacement blocks and re-enable
-            $oldLifetime = $this->helper()->getLifetime();
-            $this->helper()->setLifetime(FALSE);
-            $controller->preDispatch();
             $controller->dispatch('json');
-            $this->helper()->setLifetime($oldLifetime);
 
-            return "<script type=\"text/javascript\">Diehard.replaceBlocks({$response->getBody()});</script>";
+            return "<script type=\"text/javascript\">/* <![CDATA[ */Diehard.replaceBlocks({$response->getBody()});/* ]]> */</script>";
         }
 
         // No dynamic blocks at this time
@@ -270,5 +268,4 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
         }
         return $this->_cache;
     }
-
 }
