@@ -167,6 +167,7 @@
             <diehard>
                 <usejs>1</usejs>
                 <jslib>diehard/fpc-prototype.js</jslib>
+                <disable_3rdparty_ajax>1</disable_3rdparty_ajax>
             </diehard>
         </system>
         <dev>

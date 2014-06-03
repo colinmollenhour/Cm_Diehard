@@ -48,7 +48,7 @@ Diehard.prototype =
             };
             new Ajax.Request(this.url, {
                 method: 'get',
-                parameters: {json: Object.toJSON(params)},
+                parameters: {json: Object.toJSON(params), is_diehard: 1},
                 evalJSON: 'force',
                 onSuccess: function(response) {
                     Diehard.replaceBlocks(response.responseJSON);
