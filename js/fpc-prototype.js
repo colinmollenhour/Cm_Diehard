@@ -58,8 +58,10 @@ Diehard.prototype =
     }
 };
 Diehard.replaceBlocks = function(data) {
+  if (! Object.isArray(data.blocks)) {
     $H(data.blocks).each(function(block){
         var matches = $$(block.key);
         if(matches.length) { matches[0].replace(block.value); }
     });
+  }
 };
