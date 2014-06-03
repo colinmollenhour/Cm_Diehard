@@ -42,6 +42,9 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
         static $enabled = NULL;
         if($enabled === NULL) {
             $enabled = Mage::app()->useCache('diehard') && Mage::getStoreConfig(self::XML_PATH_BACKEND);
+            if ($enabled && $this->isThirdPartyAjaxRequest()) {
+                $enabled = ! Mage::getStoreConfig(self::XML_PATH_DISABLE_AJAX);
+            }
         }
         return $enabled;
     }
@@ -50,11 +53,6 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $request = Mage::app()->getRequest();
         return $request->isAjax() && ! $request->getParam('is_diehard');
-    }
-    
-    public function isDisabledOnThirdPartyAjaxRequests()
-    {
-        return $this->isThirdPartyAjaxRequest() && Mage::getStoreConfig(self::XML_PATH_DISABLE_AJAX);
     }
 
     /**
