@@ -213,7 +213,7 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             $controller = new Cm_Diehard_LoadController($request, $response);
             $controller->dispatch('json');
 
-            return "<script type=\"text/javascript\">Diehard.replaceBlocks({$response->getBody()});</script>";
+            return "<script type=\"text/javascript\">/* <![CDATA[ */Diehard.replaceBlocks({$response->getBody()});/* ]]> */</script>";
         }
 
         // No dynamic blocks at this time
