@@ -25,16 +25,18 @@ class Cm_Diehard_Model_Observer
         if (Mage::registry('diehard')) {
             return;
         }
-        Mage::register('diehard', $this->helper());
-        if ($this->helper()->isEnabled() && Mage::app()->getRequest()->isGet())
+        $helper = $this->helper();
+        Mage::register('diehard', $helper);
+        if ($helper->isEnabled() && Mage::app()->getRequest()->isGet()
+            && ! $helper->isDisabledOnThirdPartyAjaxRequests())
         {
             $fullActionName = $observer->getControllerAction()->getFullActionName();
 
-            $lifetime = $this->helper()->isCacheableAction($fullActionName);
+            $lifetime = $helper->isCacheableAction($fullActionName);
             if ($lifetime)
             {
                 // Set current request as cacheable for the given lifetime
-                $this->helper()->setLifetime($lifetime);
+                $helper->setLifetime($lifetime);
             }
         }
     }
