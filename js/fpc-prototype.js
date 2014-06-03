@@ -62,4 +62,5 @@ Diehard.replaceBlocks = function(data) {
         var matches = $$(block.key);
         if(matches.length) { matches[0].replace(block.value); }
     });
+    document.fire('diehard:load', {data: data});
 };
