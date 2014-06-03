@@ -182,7 +182,7 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
         if ($ignoredBlocks == '-') {
           return array();
         }
-        return ($ignoredBlocks === NULL ? NULL : explode(',', $ignoredBlocks));
+        return ($ignoredBlocks === FALSE ? NULL : explode(',', $ignoredBlocks));
     }
 
     /**

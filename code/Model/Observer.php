@@ -57,7 +57,7 @@ class Cm_Diehard_Model_Observer
             ));
 
             // Update ignored blocks cookie
-            $ignored = (array) $this->helper()->getIgnoredBlocks();
+            $ignored = $this->helper()->getIgnoredBlocks();
             if ($ignored === NULL) {
                 $ignored = $this->helper()->getDefaultIgnoredBlocks();
             }

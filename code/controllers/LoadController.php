@@ -45,7 +45,7 @@ class Cm_Diehard_LoadController extends Mage_Core_Controller_Front_Action
         $this->loadLayout($handles);
         $layout = $this->getLayout();
 
-        $ignoredBlocks = $helper->getIgnoredBlocks();
+        $ignoredBlocks = (array) $helper->getIgnoredBlocks();
         
         // Render all blocks contents
         if ($this->getRequest()->getParam('all_blocks')) {
