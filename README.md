@@ -3,7 +3,7 @@
 This module aims to make it easy to serve up cacheable HTML pages without falling back to
 fully-dynamic pages as soon as the visitor takes an individualized action like adding a product
 to their cart. It has several cache backend models to choose from and supports dynamic block
-replacement via Ajax, ESI or non-Ajax Javascript. This hole-punching is only performed as-needed
+replacement via Ajax, ESI (edge-side includes) or non-Ajax Javascript. This hole-punching is only performed as-needed
 by using a cookie to keep track of which blocks (if any) need to be dynamic. The backends also differ
 in the way that cache invalidation is handled by using some interesting techniques; some of which
 allow for _real-time_ cache invalidation even with a caching reverse proxy! The rendering technique allows
@@ -12,24 +12,28 @@ for users with dynamic blocks to still warm the cache for other users to further
 ## Backends
 
 There are currently three backends and three hole-punching (injection) methods. Not all backends support
-all injection methods. The injection methods are:
+all injection methods. The backend and supported injection methods are:
 
- - Ajax
- - ESI (edge-side includes)
+- Local Backend
  - Javascript (served inline with the response)
+- Proxy Backend
+ - Ajax
+ - ESI
+- Revalidating Backend
+ - Ajax
+ - ESI
 
 Note that all injection methods use a single injection point rather than one for every "hole".
 
-### Magento Backend
+### Local Backend
 
 This backend is like the Enterprise FPC except it currently uses Javascript (but not Ajax) for hole
 punching. It does a lightweight cached response by default, and appends the dynamic blocks to the response.
 The purpose for this backend is mainly to make testing easier in the absence of a reverse proxy although
 it should still have much better performance than no caching at all.
 
-NOTE: This backend currently uses the core Magento cache storage for it's cache storage so be prepared
-for your cache storage to increase drastically. This will eventually be changed to support a cache backend
-separate from the core cache backend.
+This backend may use either the Magento app cache instance (default), or a separately configured cache instance
+by configuring `global/diehard_cache/backend` and `global/diehard_cache/backend_options`.
 
 ### Proxy Backend
 
@@ -303,14 +307,14 @@ from the ignored blocks list.
 
 ## Hit Rate Monitor
 
-Redis can be used for monitoring the hit-rate of the cache on the revalidate backend and the Magento backend.
+Redis can be used for monitoring the hit-rate of the cache on the Revalidate backend and the Local backend.
 To enable this feature you must have Credis_Client present in your lib directory:
 
     git clone git://github.com/colinmollenhour/credis.git lib/Credis
 
 Then setup your configuration in app/etc/local.xml:
 
-```
+```xml
 <!-- CONFIG -->
   <global>
     ...

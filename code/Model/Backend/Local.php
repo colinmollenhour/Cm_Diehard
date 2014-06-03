@@ -1,6 +1,7 @@
 <?php
 /**
- * This cache backend uses Magento's main cache storage for full page cache.
+ * This cache backend uses a local cache instance for full page cache. By default it uses
+ * Magento's main cache storage, but a separate cache storage can also be specified.
  *
  * Pros:
  *   - Drop-in and go, no additional requirements
@@ -9,29 +10,37 @@
  *   - Experimental: can do dynamic replacement without using Ajax
  * Cons:
  *   - Magento is still loaded (but, controller is only dispatched when necessary)
- *   - Will probably increase size of Magento's cache considerably
  *
- * TODO: extend this with a version which uses a separate cache backend so primary cache is not affected
  *
  * To use this backend you must add it to the cache request processors in app/etc/local.xml:
  *
- * <cache>
- *   <request_processors>
- *     <diehard>Cm_Diehard_Model_Backend_Magento</diehard>
- *   </request_processors>
- *   <restrict_nocache>1</restrict_nocache> <!-- Set to 1 to serve cached response in spite of no-cache request header -->
- *   ...
+ * <global>
+ *     ...
+ *     <cache>
+ *         ...
+ *         <request_processors>
+ *             <diehard>Cm_Diehard_Model_Backend_Local</diehard>
+ *         </request_processors>
+ *         <restrict_nocache>1</restrict_nocache> <!-- Set to 1 to serve cached response in spite of no-cache request header -->
+ *     </cache>
+ *     <diehard_cache><!-- OPTIONAL -->
+ *         <backend>...</backend>
+ *         <backend_options>
+ *             ...
+ *         </backend_options>
+ *     </diehard_cache>
  * </cache>
  *
  * @package     Cm_Diehard
  * @author      Colin Mollenhour
  */
-class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
+class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
 {
 
     const XML_PATH_RESTRICT_NOCACHE               = 'global/cache/restrict_nocache';
+    const XML_PATH_DIEHARD_CACHE                  = 'global/diehard_cache';
 
-    protected $_name = 'Magento';
+    protected $_name = 'Local';
 
     /* Supported methods: */
     protected $_useAjax = TRUE;
@@ -39,6 +48,11 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
     protected $_useJs   = TRUE;
 
     protected $_useCachedResponse = NULL;
+    protected $_cache;
+
+    protected $_defaultBackendOptions = array(
+        'file_name_prefix'          => 'diehard',
+    );
 
     /**
      * Clear all cached pages
@@ -47,16 +61,25 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
      */
     public function flush()
     {
-        Mage::app()->getCacheInstance()->cleanType('diehard');
+        if ($this->_getCacheInstance() == Mage::app()->getCacheInstance()) {
+            $this->_getCacheInstance()->cleanType('diehard');
+        } else {
+            $this->_getCacheInstance()->flush();
+        }
     }
 
     /**
+     * Called by 'application_clean_cache' observer
+     *
      * @param  $tags
      * @return void
      */
     public function cleanCache($tags)
     {
-        // No additional cleaning necessary
+        // Additional cleaning only necessary if using a separate backend
+        if ($this->_getCacheInstance() != Mage::app()->getCacheInstance()) {
+            $this->_getCacheInstance()->clean($tags);
+        }
     }
 
     /**
@@ -75,7 +98,7 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             $cacheKey = $this->getCacheKey();
             $tags = $this->helper()->getTags();
             $tags[] = Cm_Diehard_Helper_Data::CACHE_TAG;
-            Mage::app()->saveCache($response->getBody(), $cacheKey, $tags, $lifetime);
+            $this->_getCacheInstance()->save($response->getBody(), $cacheKey, $tags, $lifetime);
         }
 
         // Inject dynamic content replacement at end of body
@@ -123,7 +146,7 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             return FALSE;
         }
         $cacheKey = $this->getCacheKey();
-        if(Mage::app()->getCacheInstance()->getFrontend()->test($cacheKey)) {
+        if($this->_getCacheInstance()->getFrontend()->test($cacheKey)) {
             $this->setUseCachedResponse(TRUE);
 
             // Allow external code to cancel the sending of a cached response
@@ -134,7 +157,7 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
             }
 
             if($this->getUseCachedResponse()) {
-                if ($body = Mage::app()->loadCache($cacheKey)) {
+                if ($body = $this->_getCacheInstance()->load($cacheKey)) {
                     // Inject dynamic content replacement at end of body
                     $body = $this->injectDynamicBlocks($body);
                     Mage::app()->getResponse()->setHeader('X-Diehard', 'HIT');
@@ -222,6 +245,30 @@ class Cm_Diehard_Model_Backend_Magento extends Cm_Diehard_Model_Backend_Abstract
         else {
             return '';
         }
+    }
+
+    /**
+     * Returns either the Magento app cache instance or a custom cache instance
+     *
+     * @return Mage_Core_Model_Cache
+     */
+    protected function _getCacheInstance()
+    {
+        if ( ! $this->_cache) {
+            if ($cacheConfig =  Mage::app()->getConfig()->getNode(self::XML_PATH_DIEHARD_CACHE)) {
+                $this->_defaultBackendOptions['cache_dir'] = Mage::getBaseDir('var').DS.'diehard_cache';
+                Mage::app()->getConfig()->createDirIfNotExists($this->_defaultBackendOptions['cache_dir']);
+                $options = $cacheConfig->asArray();
+                if ( ! isset($options['backend_options'])) {
+                    $options['backend_options'] = array();
+                }
+                $options['backend_options'] = array_merge($this->_defaultBackendOptions, $options['backend_options']);
+                $this->_cache = Mage::getModel('core/cache', $options);
+            } else {
+                $this->_cache = Mage::app()->getCacheInstance();
+            }
+        }
+        return $this->_cache;
     }
 
 }
