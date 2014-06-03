@@ -56,22 +56,22 @@ class Cm_Diehard_Model_Observer
               'lifetime' => $this->helper()->getLifetime(),
             ));
 
-            $lifetime = $this->helper()->getLifetime();
-            if($lifetime !== FALSE) { // 0 lifetime allowed (e.g. max-age=0)
-                // Allow backend to take action on responses that are to be cached
-                $this->helper()->getBackend()->httpResponseSendBefore($response, $lifetime);
-            }
-
             // Update ignored blocks cookie
             $ignored = (array) $this->helper()->getIgnoredBlocks();
             if ($ignored === NULL) {
-              $ignored = $this->helper()->getDefaultIgnoredBlocks();
+                $ignored = $this->helper()->getDefaultIgnoredBlocks();
             }
             $addedIgnored = $this->helper()->getAddedIgnoredBlocks();
             $removedIgnored = $this->helper()->getRemovedIgnoredBlocks();
             $ignored = array_unique(array_merge($ignored, $addedIgnored));
             $ignored = array_diff($ignored, $removedIgnored);
             $this->helper()->setIgnoredBlocks($ignored);
+
+            $lifetime = $this->helper()->getLifetime();
+            if($lifetime !== FALSE) { // 0 lifetime allowed (e.g. max-age=0)
+                // Allow backend to take action on responses that are to be cached
+                $this->helper()->getBackend()->httpResponseSendBefore($response, $lifetime);
+            }
 
             // Add debug data
             if($this->helper()->isDebug()) {
