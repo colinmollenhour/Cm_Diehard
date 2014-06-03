@@ -79,9 +79,8 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
             return;
         }
         Mage::unregister('diehard_lifetime');
-        if($lifetime = (int)$lifetime) {
-            Mage::register('diehard_lifetime', $lifetime);
-        }
+        $lifetime = $lifetime === FALSE ? $lifetime : (int) $lifetime;
+        Mage::register('diehard_lifetime', $lifetime);
         $this->_lifetime = $lifetime;
     }
 
