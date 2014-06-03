@@ -52,11 +52,25 @@ your html and still enjoy real-time invalidation! Ajax and ESI hole-punching are
 
 ## Enabling Cache
 
+### Add the cache backend to your local.xml
+
+Add the request processor to your `local.xml` under the `global` node:
+
+```xml
+<cache>
+    <request_processors>
+        <diehard>Cm_Diehard_Model_Backend_Magento</diehard>
+    </request_processors>
+</cache>
+```
+
+### Set the cache lifetime for some of your actions.
+
 By default no caching is enabled by Cm_Diehard. There are three methods of enabling caching but in
 all cases it is recommended to implement your caching scheme in a separate module from Cm_Diehard.
 A falsey value (0, null, false, '') for the cache lifetime disables caching for the current page.
 
-### config.xml
+#### Option 1 - config.xml
 
 Set the lifetime in seconds based on the full action name in config.xml:
 
@@ -73,7 +87,7 @@ Set the lifetime in seconds based on the full action name in config.xml:
 </config>
 ```
 
-### Layout updates
+### Option 2 - Layout updates
 
 Every block inherits a new method named "setDiehardCacheLifetime" which takes the desired lifetime
 in seconds. Layout updates will override the values in config.xml.
@@ -88,7 +102,7 @@ in seconds. Layout updates will override the values in config.xml.
 </layout>
 ```
 
-### Event observers, controllers, blocks, etc..
+### Option 3 - Event observers, controllers, blocks, etc..
 
 In any code before the `http_response_send_before` event is dispatched, you can set the lifetime
 using the 'diehard' helper. The helper is added to the Magento registry with the key 'diehard' so
