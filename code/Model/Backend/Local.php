@@ -161,6 +161,7 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
                 if ($body = $this->_getCacheInstance()->load($cacheKey)) {
                     // Inject dynamic content replacement at end of body
                     $body = $this->injectDynamicBlocks($body);
+                    Mage::app()->getResponse()->setHeader('X-Diehard', 'HIT');
                     $counter = new Cm_Diehard_Helper_Counter;
                     $counter->logRequest(FALSE, TRUE); // TODO - retrieve fullActionName
                     return $body;
