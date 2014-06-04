@@ -72,6 +72,9 @@ class Cm_Diehard_LoadController extends Mage_Core_Controller_Front_Action
             }
         }
 
+        // Ensure empty array is JSON encoded as {} and not []
+        $response['blocks'] = $response['blocks'] ?: new stdClass();
+
         // Restore caching mode
         $helper->setLifetime($oldLifetime);
 
