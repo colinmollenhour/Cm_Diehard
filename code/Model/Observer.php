@@ -46,7 +46,7 @@ class Cm_Diehard_Model_Observer
      */
     public function httpResponseSendBefore(Varien_Event_Observer $observer)
     {
-        if($this->helper()->isEnabled()) {
+        if($this->helper()->isEnabled() && ! Mage::registry('diehard_cache_hit')) {
             $response = $observer->getResponse(); /* @var $response Mage_Core_Controller_Response_Http */
             $fullActionName = $this->helper()->getFullActionName();
 

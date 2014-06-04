@@ -9,6 +9,8 @@ in the way that cache invalidation is handled by using some interesting techniqu
 allow for _real-time_ cache invalidation even with a caching reverse proxy! The rendering technique allows
 for users with dynamic blocks to still warm the cache for other users to further increase the cache hit rate.
 
+For a sample implementation of Cm_Diehard for Magento CE see [Cm_DiehardSample](https://github.com/colinmollenhour/Cm_DiehardSample).
+
 ## Backends
 
 There are currently three backends and three hole-punching (injection) methods. Not all backends support

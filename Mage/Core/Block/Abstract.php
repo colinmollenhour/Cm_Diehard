@@ -1524,7 +1524,7 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
         if (Mage::registry('diehard_lifetime')) {
             if (! $selector) {
                 $selector = $this->getDiehardSelector();
-                $this->setFrameTags('div id="' . substr($selector,1) . '"', '/div');
+                $this->setFrameTags('span id="' . substr($selector,1) . '"', '/span');
             }
             $helper = Mage::helper('diehard'); /* @var $helper Cm_Diehard_Helper_Data */
             $helper->addDynamicBlock($selector, $this->getNameInLayout());
