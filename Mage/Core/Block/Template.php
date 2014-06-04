@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -31,7 +31,8 @@
  * @category   Mage
  * @package    Mage_Core
  * @author      Magento Core Team <core@magentocommerce.com>
- * 
+ *
+ * Magic methods added by Cm_Diehard:
  * @method string getCacheFriendlyTemplate()
  * @method Mage_Core_Block_Template setCacheFriendlyTemplate(string $file)
  */
@@ -102,9 +103,11 @@ class Mage_Core_Block_Template extends Mage_Core_Block_Abstract
      */
     public function getTemplate()
     {
+        /* START: Added by Cm_Diehard */
         if ($this->getBlockIsDynamic() && Mage::registry('diehard_lifetime') && $this->getCacheFriendlyTemplate()) {
             return $this->getCacheFriendlyTemplate();
         }
+        /* END: Added by Cm_Diehard */
         return $this->_template;
     }
 
