@@ -48,14 +48,10 @@
 
             <!-- List of available cache backend models -->
             <backends>
-                <magento>
-                    <label>Magento Cache</label>
-                    <model>diehard/backend_magento</model>
-                </magento>
-                <file>
-                    <label>File Cache</label>
-                    <model>diehard/backend_file</model>
-                </file>
+                <local>
+                    <label>Local Cache</label>
+                    <model>diehard/backend_local</model>
+                </local>
                 <proxy>
                     <label>Basic Reverse-Proxy Cache</label>
                     <model>diehard/backend_proxy</model>
