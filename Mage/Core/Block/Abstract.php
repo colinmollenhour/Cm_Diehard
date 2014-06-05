@@ -1430,7 +1430,7 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
         /* START: Changed by Cm_Diehard */
         // Add block cache tags to diehard tags
         $tags = $this->getCacheTags();
-        if(Mage::helper('diehard')->getLifetime()) {
+        if (Mage::helper('diehard')->getLifetime()) {
             Mage::helper('diehard')->addTags($tags);
         }
         /* END: Changed by Cm_Diehard */

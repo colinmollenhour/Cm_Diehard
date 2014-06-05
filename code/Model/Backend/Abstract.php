@@ -60,7 +60,7 @@ abstract class Cm_Diehard_Model_Backend_Abstract
      */
     public function getCacheKey()
     {
-        if( ! self::$_cacheKey) {
+        if ( ! self::$_cacheKey) {
             self::$_cacheKey = strtoupper(implode('_', array(
                 'DIEHARD',
                 $this->_name,

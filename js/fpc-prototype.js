@@ -33,14 +33,14 @@ Diehard.prototype =
           ignored = ignored.split(',');
         }
         this.blocks = $H(this.blocks).inject({}, function(acc, pair){
-            if( ! ignored.member(pair.value)) {
+            if ( ! ignored.member(pair.value)) {
                 acc[pair.key] = pair.value;
             }
             return acc;
         });
 
         // Fetch dynamic content
-        if($H(this.blocks).keys().length) {
+        if ($H(this.blocks).keys().length) {
             var params = {
                 full_action_name: this.action,
                 blocks: this.blocks,
@@ -60,7 +60,7 @@ Diehard.prototype =
 Diehard.replaceBlocks = function(data) {
     $H(data.blocks).each(function(block){
         var matches = $$(block.key);
-        if(matches.length) { matches[0].replace(block.value); }
+        if (matches.length) { matches[0].replace(block.value); }
     });
     document.fire('diehard:load', {data: data});
 };

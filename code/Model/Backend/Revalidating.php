@@ -88,7 +88,7 @@ class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Backend_Abs
         // If a record exists then any content generated at the time the record was is assumed to not be stale
         if ( ! ($cacheData = Mage::app()->loadCache($cacheKey))) {
             $fullActionName = $this->helper()->getFullActionName();
-            if($useEtags) {
+            if ($useEtags) {
                 $cacheData = $fullActionName.':'.sha1(microtime().mt_rand());
             } else {
                 $cacheData = $fullActionName.':'.$this->_rfc1123Date();
@@ -104,7 +104,7 @@ class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Backend_Abs
         $cacheControl = sprintf(Mage::getStoreConfig('system/diehard/cachecontrol'), $lifetime);
         $response->setHeader('Cache-Control', $cacheControl, true);
         $response->setHeader('Expires', $this->_rfc1123Date(time() + $lifetime), true);
-        if($useEtags) {
+        if ($useEtags) {
             $response->setHeader('ETag', 'W/"'.$cacheData.'"', true);
         } else {
             $response->setHeader('Last-Modified', $cacheData, true);
@@ -125,7 +125,7 @@ class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Backend_Abs
         $hit = FALSE;
 
         // Use ETags if given
-        if(
+        if (
              ($ifNoneMatch = Mage::app()->getRequest()->getHeader('If-None-Match'))
           && ($cacheData = Mage::app()->loadCache($this->getCacheKey()))
         ) {
@@ -139,7 +139,7 @@ class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Backend_Abs
         }
 
         // Fall-back to Last-Modified if given
-        else if(
+        else if (
              ($ifModifiedSince = Mage::app()->getRequest()->getHeader('If-Modified-Since'))
           && ($cacheData = Mage::app()->loadCache($this->getCacheKey()))
         ) {

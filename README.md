@@ -124,7 +124,7 @@ need to be modified or added and no block class overrides are needed, just a sim
 
 ```php
 <!-- TEMPLATE mymodule/greeting.phtml -->
-<?php if( ! Mage::helper('customer')->isLoggedIn() ): ?>
+<?php if ( ! Mage::helper('customer')->isLoggedIn() ): ?>
 <p><?php echo $this->__('Welcome!') ?></p>
 <?php else: ?>
 <p><?php echo $this->__('Welcome back, %s!', Mage::helper('customer')->getCustomerName()) ?>
@@ -147,7 +147,7 @@ any pre-existing templates or add logic to your template files.
 
 ```php
 <!-- TEMPLATE mymodule/greeting.phtml -->
-<?php if( ! Mage::helper('customer')->isLoggedIn() ): ?>
+<?php if ( ! Mage::helper('customer')->isLoggedIn() ): ?>
 <p><?php echo $this->__('Welcome!') ?></p>
 <?php else: ?>
 <p><?php echo $this->__('Welcome back, %s!', Mage::helper('customer')->getCustomerName()) ?>
@@ -200,7 +200,7 @@ responses and you don't want to have separate template files or use the empty pl
 
 ```php
 <!-- TEMPLATE mymodule/greeting.phtml -->
-    <?php if( Mage::registry('diehard_lifetime') || ! Mage::helper('customer')->isLoggedIn() ): ?>
+    <?php if ( Mage::registry('diehard_lifetime') || ! Mage::helper('customer')->isLoggedIn() ): ?>
     <p><?php echo $this->__('Welcome!') ?></p>
     <?php else: ?>
     <p><?php echo $this->__('Welcome back, %s!', Mage::helper('customer')->getCustomerName()) ?>

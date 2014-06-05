@@ -152,7 +152,7 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
             return FALSE;
         }
         $cacheKey = $this->getCacheKey();
-        if($this->_getCacheInstance()->getFrontend()->test($cacheKey)) {
+        if ($this->_getCacheInstance()->getFrontend()->test($cacheKey)) {
             $this->setUseCachedResponse(TRUE);
 
             // Allow external code to cancel the sending of a cached response
@@ -162,7 +162,7 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
                 Mage::dispatchEvent('diehard_use_cached_response', array('backend' => $this));
             }
 
-            if($this->getUseCachedResponse()) {
+            if ($this->getUseCachedResponse()) {
                 if ($body = $this->_getCacheInstance()->load($cacheKey)) {
                     // Inject dynamic content replacement at end of body
                     $params = $this->extractParamsFromBody($body);
@@ -202,10 +202,10 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
     public function getDynamicBlockReplacement($params)
     {
         // Append dynamic block content to end of page to be replaced by javascript, but not Ajax
-        if($params['blocks'] || ! empty($params['all_blocks']))
+        if ($params['blocks'] || ! empty($params['all_blocks']))
         {
             // Init store if it has not been yet (page served from cache)
-            if( ! $this->helper()->isAppInited()) {
+            if ( ! $this->helper()->isAppInited()) {
                 $appParams = Mage::registry('application_params');
                 Mage::app()->init($appParams['scope_code'], $appParams['scope_type'], $appParams['options']);
             }

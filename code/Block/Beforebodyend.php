@@ -41,7 +41,7 @@ class Cm_Diehard_Block_Beforebodyend extends Mage_Core_Block_Template
     public function getLoadAjaxUrl()
     {
         $params = array();
-        if(Mage::app()->getStore()->isCurrentlySecure()) {
+        if (Mage::app()->getStore()->isCurrentlySecure()) {
             $params['_secure'] = TRUE;
         }
         return Mage::getUrl('_diehard/load/json', $params);
@@ -53,7 +53,7 @@ class Cm_Diehard_Block_Beforebodyend extends Mage_Core_Block_Template
     public function getLoadEsiUrl()
     {
         $params = array();
-        if(Mage::app()->getStore()->isCurrentlySecure()) {
+        if (Mage::app()->getStore()->isCurrentlySecure()) {
             $params['_secure'] = TRUE;
         }
         $params['json'] = json_encode($this->getDynamicParamsCombined());

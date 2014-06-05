@@ -98,7 +98,7 @@ class Cm_Diehard_Model_Backend_Proxy extends Cm_Diehard_Model_Backend_Abstract
             $ids = Mage::app()->getCache()->getIdsMatchingAnyTags($tags);
             $urls = array();
             foreach($ids as $id) {
-              if($url = Mage::app()->loadCache($id)) {
+              if ($url = Mage::app()->loadCache($id)) {
                 $urls[] = $url;
               }
             }
@@ -109,8 +109,8 @@ class Cm_Diehard_Model_Backend_Proxy extends Cm_Diehard_Model_Backend_Abstract
             // Dump urls to file
             if ($urls) {
                 $dir = Mage::getBaseDir('var').DS.'diehard'.DS.'proxy';
-                if( ! is_dir($dir)) {
-                    if( ! mkdir($dir, 0770, TRUE)) {
+                if ( ! is_dir($dir)) {
+                    if ( ! mkdir($dir, 0770, TRUE)) {
                         Mage::log('Could not create diehard directory: '.$dir, Zend_Log::CRIT);
                     }
                 }

@@ -39,7 +39,7 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     public function isEnabled()
     {
         static $enabled = NULL;
-        if($enabled === NULL) {
+        if ($enabled === NULL) {
             $enabled = Mage::app()->useCache('diehard') && Mage::getStoreConfig(self::XML_PATH_BACKEND);
         }
         return $enabled;
@@ -254,7 +254,7 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
 
         $observedBlocks = array();
         foreach($this->getDynamicBlocks() as $htmlId => $nameInLayout) {
-            if(in_array($nameInLayout, $blocks)) {
+            if (in_array($nameInLayout, $blocks)) {
                 $observedBlocks[$htmlId] = $nameInLayout;
             }
         }
@@ -296,7 +296,7 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
         $area = Mage::app()->getLayout()->getArea();
         $path = $area . '/diehard/actions/' . $fullActionName;
         $lifeTime = Mage::app()->getConfig()->getNode($path);
-        if($lifeTime) {
+        if ($lifeTime) {
             return intval($lifeTime);
         }
         return false;
