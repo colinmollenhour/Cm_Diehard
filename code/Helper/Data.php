@@ -213,6 +213,11 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
           $ignoredBlocks = '-';
         }
+        if ( ! $this->isAppInited()) {
+            /* TODO - use a lighter-weight way to set cookie in case full init is not necessary */
+            $appParams = Mage::registry('application_params');
+            Mage::app()->initSpecified($appParams['scope_code'], $appParams['scope_type'], $appParams['options']);
+        }
         Mage::getSingleton('core/cookie')->set(self::COOKIE_IGNORED_BLOCKS, $ignoredBlocks);
     }
 
