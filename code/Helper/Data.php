@@ -50,7 +50,19 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function isDebug()
     {
-        return Mage::getStoreConfigFlag(self::XML_PATH_DEBUG);
+        if ($this->isAppInited()) {
+            return Mage::getStoreConfigFlag(self::XML_PATH_DEBUG);
+        } else {
+            return Mage::getIsDeveloperMode();
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAppInited()
+    {
+        return !! Mage::app()->getStores();
     }
 
     /**

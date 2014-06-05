@@ -205,7 +205,7 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
         if($params['blocks'] || ! empty($params['all_blocks']))
         {
             // Init store if it has not been yet (page served from cache)
-            if(! Mage::app()->getStores()) {
+            if( ! $this->helper()->isAppInited()) {
                 $appParams = Mage::registry('application_params');
                 Mage::app()->init($appParams['scope_code'], $appParams['scope_type'], $appParams['options']);
             }
@@ -239,12 +239,21 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
             $controller = new Cm_Diehard_LoadController($request, $response);
             $controller->dispatch('json');
 
-            return "<script type=\"text/javascript\">/* <![CDATA[ */Diehard.replaceBlocks({$response->getBody()});/* ]]> */</script>";
+            $replacement = '';
+            if ($this->helper()->isDebug()) {
+                $replacement .= '<!-- Dynamic blocks rendered: '.(empty($params['all_blocks']) ? implode(',', $params['blocks']) : 'ALL').' -->'."\n";
+            }
+            $replacement .= "<script type=\"text/javascript\">/* <![CDATA[ */Diehard.replaceBlocks({$response->getBody()});/* ]]> */</script>";
+            return $replacement;
         }
 
         // No dynamic blocks at this time
         else {
-            return '';
+            if ($this->helper()->isDebug()) {
+                return '<!-- No dynamic blocks -->';
+            } else {
+                return '';
+            }
         }
     }
 
