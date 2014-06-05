@@ -22,6 +22,7 @@
  *             <diehard>Cm_Diehard_Model_Backend_Local</diehard>
  *         </request_processors>
  *         <restrict_nocache>1</restrict_nocache> <!-- Set to 1 to serve cached response in spite of no-cache request header -->
+ *         <early_flush>1</early_flush> <!-- Flush cached portion of page before rendering dynamic portion -->
  *     </cache>
  *     <diehard_cache><!-- OPTIONAL -->
  *         <backend>...</backend>
@@ -38,6 +39,7 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
 {
 
     const XML_PATH_RESTRICT_NOCACHE               = 'global/cache/restrict_nocache';
+    const XML_PATH_EARLY_FLUSH                    = 'global/cache/early_flush';
     const XML_PATH_DIEHARD_CACHE                  = 'global/diehard_cache';
 
     protected $_name = 'Local';
@@ -164,6 +166,9 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
 
             if ($this->getUseCachedResponse()) {
                 if ($body = $this->_getCacheInstance()->load($cacheKey)) {
+                    Mage::app()->getResponse()->setHeader('X-Diehard', 'HIT');
+                    Mage::register('diehard_cache_hit', TRUE);
+
                     // Inject dynamic content replacement at end of body
                     $params = $this->extractParamsFromBody($body);
                     if ($params) {
@@ -177,11 +182,37 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
                         $params['blocks'] = array_diff($blocksToRender, $ignoredBlocks);
 
                         // Replace params with rendered blocks
-                        $dynamic = $this->getDynamicBlockReplacement($params);
-                        $body = $this->replaceParamsInBody($body, $dynamic);
+                        $startTime = microtime(1);
+
+                        // Use early flush
+                        if (($params['blocks'] || ! empty($params['all_blocks']))
+                          && (int) Mage::app()->getConfig()->getNode(self::XML_PATH_EARLY_FLUSH)
+                        ) {
+                            $_body = $this->replaceParamsInBody($body, '');
+                            list($first,$last) = explode('</body>', $_body, 2);
+
+                            // Flush cached portion (start session first)
+                            $this->helper()->initApp();
+                            Mage::getSingleton('core/session', array('name' => $params['session_name']));
+                            Mage::app()->getResponse()->setBody($first)->sendResponse(); // Flush cached portion
+                            ob_flush(); flush(); // Try to force flush
+                            Mage::app()->setResponse(new Mage_Core_Controller_Response_Http);
+                            $dynamic = $this->getDynamicBlockReplacement($params);
+                            if ($this->helper()->isDebug()) {
+                                $dynamic .= sprintf("\n<!-- Dynamic render time: %.3f seconds -->", microtime(1) - $startTime);
+                            }
+                            $body = $dynamic.'</body>'.$last; // Flush dynamic portion
+                        }
+
+                        // Do not use early flush
+                        else {
+                            $dynamic = $this->getDynamicBlockReplacement($params);
+                            if ($this->helper()->isDebug()) {
+                                Mage::app()->getResponse()->setHeader('X-Diehard-Dynamic-Render', sprintf('%.3f seconds', microtime(1) - $startTime));
+                            }
+                            $body = $this->replaceParamsInBody($body, $dynamic);
+                        }
                     }
-                    Mage::app()->getResponse()->setHeader('X-Diehard', 'HIT');
-                    Mage::register('diehard_cache_hit', TRUE);
                     $counter = new Cm_Diehard_Helper_Counter;
                     $counter->logRequest($params ? $params['full_action_name'] : NULL, TRUE);
                     return $body;
@@ -206,8 +237,7 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
         {
             // Init store if it has not been yet (page served from cache)
             if ( ! $this->helper()->isAppInited()) {
-                $appParams = Mage::registry('application_params');
-                Mage::app()->init($appParams['scope_code'], $appParams['scope_type'], $appParams['options']);
+                $this->helper()->initApp();
             }
             // Reset parts of app if it has been init'ed (page not served from cache but being saved to cache)
             else {

@@ -66,6 +66,15 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Complete app init
+     */
+    public function initApp()
+    {
+        $appParams = Mage::registry('application_params');
+        Mage::app()->initSpecified($appParams['scope_code'], $appParams['scope_type'], $appParams['options']);
+    }
+
+    /**
      * @return string
      */
     public function getFullActionName()
@@ -383,7 +392,7 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
                 $cookieConfig = unserialize($cookieConfig);
             }
             if ( ! $cookieConfig) {
-                Mage::app()->initSpecified($appParams['scope_code'], $appParams['scope_type'], $appParams['options']);
+                $this->initApp();
                 $cookie = Mage::getSingleton('core/cookie'); /* @var $cookie Mage_Core_Model_Cookie */
                 $cookieConfig = array(
                     'period' => $cookie->getLifetime(),
