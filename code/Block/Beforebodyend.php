@@ -25,6 +25,13 @@ class Cm_Diehard_Block_Beforebodyend extends Mage_Core_Block_Template
         $params['full_action_name'] = $this->getAction()->getFullActionName();
         $params['blocks'] = $this->diehard()->getDynamicBlocks();
         $params['params'] = $this->diehard()->getDynamicParams();
+        $params['default_ignored_blocks'] = $this->diehard()->getDefaultIgnoredBlocks();
+        if ( ! $params['blocks']) {
+            $params['blocks'] = new stdClass;
+        }
+        if ( ! $params['params']) {
+            $params['params'] = new stdClass;
+        }
         return $params;
     }
 

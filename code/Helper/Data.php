@@ -59,6 +59,9 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     public function getFullActionName()
     {
         $request = Mage::app()->getRequest();
+        if ( ! $request->getModuleName()) {
+            return NULL;
+        }
         return $request->getModuleName().'_'.$request->getControllerName().'_'.$request->getActionName();
     }
 

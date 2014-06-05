@@ -104,7 +104,12 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
         // Inject dynamic content replacement at end of body
         $body = $response->getBody('default');
         if ($this->useJs()) {
-            $body = $this->injectDynamicBlocks($body);
+            $params = $this->extractParamsFromBody($body);
+            if ($params) {
+                // Replace params with rendered blocks
+                $dynamic = $this->getDynamicBlockReplacement($params);
+                $body = $this->replaceParamsInBody($body, $dynamic);
+            }
             $response->setBody($body, 'default');
         }
     }
@@ -160,11 +165,25 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
             if($this->getUseCachedResponse()) {
                 if ($body = $this->_getCacheInstance()->load($cacheKey)) {
                     // Inject dynamic content replacement at end of body
-                    $body = $this->injectDynamicBlocks($body);
+                    $params = $this->extractParamsFromBody($body);
+                    if ($params) {
+                        // Get list of blocks to render and set ignored blocks cookie if not set
+                        $blocksToRender = $params['blocks'];
+                        $ignoredBlocks = $this->helper()->getIgnoredBlocks();
+                        if ($ignoredBlocks === NULL) {
+                            $ignoredBlocks = $params['default_ignored_blocks'];
+                            $this->helper()->setIgnoredBlocks($ignoredBlocks);
+                        }
+                        $params['blocks'] = array_diff($blocksToRender, $ignoredBlocks);
+
+                        // Replace params with rendered blocks
+                        $dynamic = $this->getDynamicBlockReplacement($params);
+                        $body = $this->replaceParamsInBody($body, $dynamic);
+                    }
                     Mage::app()->getResponse()->setHeader('X-Diehard', 'HIT');
                     Mage::register('diehard_cache_hit', TRUE);
                     $counter = new Cm_Diehard_Helper_Counter;
-                    $counter->logRequest(FALSE, TRUE); // TODO - retrieve fullActionName
+                    $counter->logRequest($params ? $params['full_action_name'] : NULL, TRUE);
                     return $body;
                 } else {
                     $this->setUseCachedResponse(NULL);
@@ -172,24 +191,6 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
             }
         }
         return FALSE;
-    }
-
-    /**
-     * @param $body
-     * @return string
-     */
-    public function injectDynamicBlocks($body)
-    {
-        // TODO - attempt to render blocks without use of controller by using xml config + models
-        // TODO - initialize block data somehow from block placeholders
-        if ($params = $this->extractParamsFromBody($body)) {
-            $dynamic = $this->getDynamicBlockReplacement($params);
-            $_body = $this->replaceParamsInBody($body, $dynamic);
-            if ($_body) {
-                return $_body;
-            }
-        }
-        return $body;
     }
 
     /**
