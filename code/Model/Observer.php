@@ -82,8 +82,7 @@ class Cm_Diehard_Model_Observer
             }
 
             // Log miss to counter
-            $counter = new Cm_Diehard_Helper_Counter;
-            $counter->logRequest($fullActionName, FALSE);
+            $this->helper()->logRequest($fullActionName, FALSE);
         }
     }
 

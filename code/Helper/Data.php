@@ -11,6 +11,7 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     const XML_PATH_BACKEND              = 'system/diehard/backend';
     const XML_PATH_DEBUG                = 'system/diehard/debug';
     const XML_PATH_JSLIB                = 'system/diehard/jslib';
+    const XML_PATH_COUNTER              = 'global/diehard/counter';
 
     const CACHE_TAG = 'DIEHARD';
 
@@ -375,6 +376,21 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     public function flush()
     {
         $this->getBackend()->flush();
+    }
+
+    /**
+     * @param string $fullActionName
+     * @param bool $hit
+     */
+    public function logRequest($fullActionName, $hit)
+    {
+        $config = Mage::getConfig()->getNode(self::XML_PATH_COUNTER);
+        if ( ! $config || ! $config->is('enabled')) {
+            return;
+        }
+
+        $counter = new Cm_Diehard_Helper_Counter($config);
+        $counter->logRequest($fullActionName, $hit);
     }
 
     /**

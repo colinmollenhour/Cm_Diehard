@@ -154,8 +154,7 @@ class Cm_Diehard_Model_Backend_Revalidating extends Cm_Diehard_Model_Backend_Abs
 
         // Log a hit - misses are logged in httpResponseSendBefore
         if ($hit) {
-            $counter = new Cm_Diehard_Helper_Counter;
-            $counter->logRequest($fullActionName, TRUE);
+            $this->helper()->logRequest($fullActionName, TRUE);
         }
 
         return $hit;

@@ -213,8 +213,7 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
                             $body = $this->replaceParamsInBody($body, $dynamic);
                         }
                     }
-                    $counter = new Cm_Diehard_Helper_Counter;
-                    $counter->logRequest($params ? $params['full_action_name'] : NULL, TRUE);
+                    $this->helper()->logRequest($params ? $params['full_action_name'] : NULL, TRUE);
                     return $body;
                 } else {
                     $this->setUseCachedResponse(NULL);
