@@ -213,12 +213,7 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
         } else {
           $ignoredBlocks = '-';
         }
-        if ( ! $this->isAppInited()) {
-            /* TODO - use a lighter-weight way to set cookie in case full init is not necessary */
-            $appParams = Mage::registry('application_params');
-            Mage::app()->initSpecified($appParams['scope_code'], $appParams['scope_type'], $appParams['options']);
-        }
-        Mage::getSingleton('core/cookie')->set(self::COOKIE_IGNORED_BLOCKS, $ignoredBlocks);
+        $this->_setCookie(self::COOKIE_IGNORED_BLOCKS, $ignoredBlocks);
     }
 
     /**
@@ -371,6 +366,46 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     public function flush()
     {
         $this->getBackend()->flush();
+    }
+
+    /**
+     * Sets a cookie with or without full app init. Caches config to avoid full app init.
+     *
+     * @param string $name
+     * @param string $value
+     */
+    protected function _setCookie($name, $value)
+    {
+        if ( ! $this->isAppInited()) {
+            $appParams = Mage::registry('application_params');
+            $cacheKey = 'DIEHARD_SETCOOKIE_'.md5(serialize($appParams));
+            if ($cookieConfig = Mage::app()->loadCache($cacheKey)) {
+                $cookieConfig = unserialize($cookieConfig);
+            }
+            if ( ! $cookieConfig) {
+                Mage::app()->initSpecified($appParams['scope_code'], $appParams['scope_type'], $appParams['options']);
+                $cookie = Mage::getSingleton('core/cookie'); /* @var $cookie Mage_Core_Model_Cookie */
+                $cookieConfig = array(
+                    'period' => $cookie->getLifetime(),
+                    'path'   => $cookie->getPath(),
+                    'domain' => $cookie->getDomain(),
+                    'admin'  => Mage::app()->getStore()->isAdmin(),
+                    'httponly' => $cookie->getHttponly(),
+                );
+                Mage::app()->saveCache(serialize($cookieConfig), $cacheKey, array(Mage_Core_Model_Config::CACHE_TAG));
+            }
+            extract($cookieConfig);
+            /* @var $period int */
+            /* @var $path string */
+            /* @var $domain string */
+            /* @var $admin bool */
+            /* @var $httponly bool */
+            $expire = $period == 0 ? 0 : time() + $period;
+            $secure = $admin && isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on';
+            setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
+        } else {
+            Mage::getSingleton('core/cookie')->set($name, $value);
+        }
     }
 
 }
