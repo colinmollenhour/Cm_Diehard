@@ -194,14 +194,19 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
                             // Flush cached portion (start session first)
                             $this->helper()->initApp();
                             Mage::getSingleton('core/session', array('name' => $params['session_name']));
-                            Mage::app()->getResponse()->setBody($first)->sendResponse(); // Flush cached portion
-                            ob_flush(); flush(); // Try to force flush
+                            Mage::app()->getResponse()->setBody($first)->sendResponse();
+                            if (ob_get_level()) {
+                                ob_flush();
+                            }
+                            flush();
+                            
+                            // Reset response for dynamic portion to be flushed after
                             Mage::app()->setResponse(new Mage_Core_Controller_Response_Http);
                             $dynamic = $this->getDynamicBlockReplacement($params);
                             if ($this->helper()->isDebug()) {
                                 $dynamic .= sprintf("\n<!-- Dynamic render time: %.3f seconds -->", microtime(1) - $startTime);
                             }
-                            $body = $dynamic.'</body>'.$last; // Flush dynamic portion
+                            $body = $dynamic.'</body>'.$last;
                         }
 
                         // Do not use early flush
