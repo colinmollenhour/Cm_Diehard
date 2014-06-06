@@ -42,7 +42,15 @@ abstract class Cm_Diehard_Model_Backend_Abstract
      */
     public function helper()
     {
-        return Mage::helper('diehard');
+        static $helper;
+        if ( ! $helper) {
+            // Bypass loading using factory pattern in case config is not present
+            if ( ! ($helper = Mage::registry('_helper/diehard'))) {
+                $helper = new Cm_Diehard_Helper_Data();
+                Mage::register('_helper/diehard', $helper);
+            }
+        }
+        return $helper;
     }
 
     /**
