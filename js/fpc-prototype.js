@@ -1,4 +1,5 @@
 var Diehard = Class.create();
+
 Diehard.prototype =
 {
     initialize: function(url, action) {
@@ -23,15 +24,38 @@ Diehard.prototype =
     },
 
     loadDynamicContent: function() {
-        // Remove ignored blocks
-        var ignored = Mage.Cookies.get('diehard_ignored');
-        if (ignored === null) { // No cookie means user has only hit cached pages thus far
-          ignored = this.defaultIgnored; // Use all default ignored blocks as ignored blocks
-        } else if (ignored == '-') { // '-' is a sentinel value for no blocks
-          ignored = [];
-        } else { // Otherwise, if cookie is present then only ignore blocks that are in the cookie
-          ignored = ignored.split(',');
+        this._removeIgnoredBlocks();
+        this._fetchDynamicContent();
+    },
+
+    /**
+     * Few cases for ignored blocks:
+     *
+     * 1. No cookie means user has only hit cached pages thus far.
+     *    In this case, we'll use all default ignored blocks as
+     *    ignored blocks
+     *
+     * 2. '-' is a sentinal value for no blocks
+     *
+     * 3. If a cookie is present, then only ignore the blocks
+     *    that are in the cookie.
+     */
+    _getIgnoredBlocks: function()
+    {
+        var ignoredCookie = Mage.Cookies.get('diehard_ignored');
+
+        if (ignoredCookie === null) {
+            return this.defaultIgnored;
+        } else if (ignoredCookie == '-') {
+            return [];
+        } else {
+            return ignoredCookie.split(',');
         }
+    },
+
+    _removeIgnoredBlocks: function()
+    {
+        var ignored = this._getIgnoredBlocks();
         this.blocks = $H(this.blocks).inject({}, function(acc, pair){
             if ( ! ignored.member(pair.value)) {
                 acc[pair.key] = pair.value;
@@ -39,7 +63,11 @@ Diehard.prototype =
             return acc;
         });
 
-        // Fetch dynamic content
+        return this;
+    },
+
+    _fetchDynamicContent: function()
+    {
         if ($H(this.blocks).keys().length) {
             var params = {
                 full_action_name: this.action,
@@ -55,8 +83,11 @@ Diehard.prototype =
                 }
             });
         }
+
+        return this;
     }
 };
+
 Diehard.replaceBlocks = function(data) {
     $H(data.blocks).each(function(block){
         var matches = $$(block.key);
