@@ -142,7 +142,7 @@ any pre-existing templates or add logic to your template files.
     <block type="core/template" name="greeting" template="mymodule/greeting.phtml">
         <action method="setBlockIsDynamic"></action>
         <action method="setCacheFriendlyTemplate"><param>mymodule/cache-friendly/greeting.phtml</param></action>
-    </reference>
+    </block>
 ```
 
 ```php
