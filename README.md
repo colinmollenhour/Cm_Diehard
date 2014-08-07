@@ -82,11 +82,11 @@ in seconds. Layout updates will override the values in config.xml.
 
 ```xml
 <layout>
-    <cms_page_view>
+    <cms_page>
         <reference name="root">
             <action method="setDiehardCacheLifetime"><int>300</int></action>
         </reference>
-    </cms_page_view>
+    </cms_page>
 </layout>
 ```
 
