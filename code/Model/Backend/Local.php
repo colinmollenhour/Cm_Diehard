@@ -201,7 +201,7 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
                             flush();
                             
                             // Reset response for dynamic portion to be flushed after
-                            Mage::app()->setResponse(new Mage_Core_Controller_Response_Http);
+                            Mage::app()->getResponse()->clearAllHeaders()->clearBody();
                             $dynamic = $this->getDynamicBlockReplacement($params);
                             if ($this->helper()->isDebug()) {
                                 $dynamic .= sprintf("\n<!-- Dynamic render time: %.3f seconds -->", microtime(1) - $startTime);
