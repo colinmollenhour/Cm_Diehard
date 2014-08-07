@@ -82,11 +82,11 @@ in seconds. Layout updates will override the values in config.xml.
 
 ```xml
 <layout>
-    <cms_page_view>
+    <cms_page>
         <reference name="root">
             <action method="setDiehardCacheLifetime"><int>300</int></action>
         </reference>
-    </cms_page_view>
+    </cms_page>
 </layout>
 ```
 
@@ -142,7 +142,7 @@ any pre-existing templates or add logic to your template files.
     <block type="core/template" name="greeting" template="mymodule/greeting.phtml">
         <action method="setBlockIsDynamic"></action>
         <action method="setCacheFriendlyTemplate"><param>mymodule/cache-friendly/greeting.phtml</param></action>
-    </reference>
+    </block>
 ```
 
 ```php
