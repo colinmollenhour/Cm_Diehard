@@ -14,11 +14,11 @@
     </default>
 
     <!-- Add dynamic blocks here -->
-    <DIEHARD_default translate="label">
+    <DIEHARD_DYNAMIC_default translate="label">
         <label>Cached Dynamic Blocks (Cm_Diehard)</label>
         <block type="core/text_list" name="widget_container" translate="label">
             <label>Widget Container (Cm_Diehard)</label>
         </block>
-    </DIEHARD_default>
+    </DIEHARD_DYNAMIC_default>
 
 </layout>

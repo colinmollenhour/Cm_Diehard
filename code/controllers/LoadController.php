@@ -39,8 +39,10 @@ class Cm_Diehard_LoadController extends Mage_Core_Controller_Front_Action
 
         // Add handles to layout
         $handles = array(
-            'DIEHARD_default',
-            'DIEHARD_'.$this->getRequest()->getParam('full_action_name')
+            'DIEHARD_default',  // DEPRECATED!!
+            'DIEHARD_'.$this->getRequest()->getParam('full_action_name'), // DEPRECATED!!
+            'DIEHARD_DYNAMIC_default',
+            'DIEHARD_DYNAMIC_'.$this->getRequest()->getParam('full_action_name')
         );
         $this->loadLayout($handles);
         $layout = $this->getLayout();

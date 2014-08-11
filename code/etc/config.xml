@@ -117,6 +117,17 @@
                 </observers>
             </controller_action_predispatch>
 
+            <!-- Inject DIEHARD_CACHED_* handles into layout update -->
+            <controller_action_layout_load_before>
+                <observers>
+                    <diehard>
+                        <type>singleton</type>
+                        <class>diehard/observer</class>
+                        <method>controllerActionLayoutLoadBefore</method>
+                    </diehard>
+                </observers>
+            </controller_action_layout_load_before>
+
             <!-- If cache is enabled, let backend cache response -->
             <http_response_send_before>
                 <observers>

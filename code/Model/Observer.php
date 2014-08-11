@@ -40,6 +40,25 @@ class Cm_Diehard_Model_Observer
     }
 
     /**
+     * Inject special layout handles into layout update if module is enabled.
+     * @param Varien_Event_Observer $observer
+     */
+    public function controllerActionLayoutLoadBefore(Varien_Event_Observer $observer)
+    {
+        if ($this->helper()->isEnabled() && $this->helper()->getLifetime()) {
+            $layout = $observer->getEvent()->getLayout(); /* @var $layout Mage_Core_Model_Layout */
+            $handles = array();
+            foreach ($layout->getUpdate()->getHandles() as $handle) {
+                $handles[] = $handle;
+                if (preg_match('/^[a-z_]+$/', $handle)) {
+                    $handles[] = 'DIEHARD_CACHED_'.$handle;
+                }
+            }
+            $layout->getUpdate()->resetHandles()->addHandle($handles);
+        }
+    }
+
+    /**
      * If caching is enabled let the backend take additional actions (set headers, cache content, etc.)
      *
      * @param Varien_Event_Observer $observer

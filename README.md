@@ -207,11 +207,40 @@ responses and you don't want to have separate template files or use the empty pl
     <?php endif; ?>
 ```
 
+## Modularity and Backwards-Compatibility
+
+In order to keep your packages/themes operable without Cm_Diehard yet still allow for maximum extensibility Diehard injects some
+special layout update handles into the layout update process. The **`DIEHARD_CACHED_default`** handle will be added after the
+`default` handle and the **`DIEHARD_CACHED_{full_action_name}`** handle will be added after the `{full_action_name}` handle **if and
+only if** caching is enabled for the page being rendered before the controller calls the `loadLayout` method. This provides the
+following benefits:
+
+ - Specify layout updates that will only be applied when the request is one that will be cached.
+ - Separate your caching-specific layout updates from the rest of your layout.
+ - Call block methods added by Cm_Diehard without making the theme dependent on Cm_Diehard being installed.
+
+Here is an example of a theme's `local.xml` file that will work with or without Cm_Diehard present:
+
+```xml
+<!-- LAYOUT -->
+    <catalog_product_view>
+        <reference name="content">
+            <block type="my/custom_block" name="my_block" />
+        </reference>
+    </catalog_product_view>
+    <DIEHARD_CACHED_catalog_product_view>
+        <reference name="my_block">
+            <action method="setBlockIsDynamic"></action>
+            <action method="addDefaultIgnored"></action>
+        </reference>
+    </DIEHARD_CACHED_catalog_product_view>
+```
+
 ## Rendering Dynamic Blocks
 
 For the dynamic blocks to be rendered they need to be made accessible to the layout. By default
 there are no blocks in the layout handles that are used to render the dynamic blocks, they must be
-added as needed. The layout handles that should be used are: DIEHARD_default and DIEHARD_{full_action_name}.
+added as needed. The layout handles that should be used are: `DIEHARD_DYNAMIC_default` and `DIEHARD_DYNAMIC_{full_action_name}`.
 This allows you to keep the layout for the rendering of dynamic blocks lightweight, but as with any
 other layout handle, these can inherit from others so you generally have two methods of adding blocks
 to the dynamic renderer layout:
@@ -220,18 +249,18 @@ to the dynamic renderer layout:
 
 ```xml
 <!--LAYOUT -->
-    <DIEHARD_default>
+    <DIEHARD_DYNAMIC_default>
         <update handle="default"/>
-    </DIEHARD>
+    </DIEHARD_DYNAMIC_default>
 ```
 
 ### À la carte
 
 ```xml
 <!-- LAYOUT -->
-    <DIEHARD_default>
+    <DIEHARD_DYNAMIC_default>
         <block type="core/template" name="greeting" template="mymodule/greeting.phtml"/>
-    </DIEHARD_default>
+    </DIEHARD_DYNAMIC_default>
 ```
 
 When using this method you must be sure that the block names match the corresponding blocks in the
