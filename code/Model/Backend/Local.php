@@ -252,7 +252,7 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
                 // TODO Consider resetting Magento entirely using Mage::reset();
             }
 
-            // Create a subrequest to get JSON response
+            // Create a sub-request to get JSON response
             $uri = $this->getBaseUrl() . '/_diehard/load/ajax';
             $request = new Mage_Core_Controller_Request_Http($uri);
             $request->setRouteName('diehard');
@@ -268,6 +268,13 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
             }
             $request->setParam('params', $params['params']);
             $request->setDispatched(true);
+
+            // Override parameters in request singleton (for Mage_Core_Block_Abstract#getRequest())
+            Mage::app()->getRequest()->clearParams();
+            Mage::app()->getRequest()->setParams($request->getParams());
+            Mage::app()->getRequest()->setParams($request->getParam('params'));
+
+            // Render sub-request into sub-response object
             $response = new Mage_Core_Controller_Response_Http;
             require_once Mage::getModuleDir('controllers', 'Cm_Diehard') . '/LoadController.php';
             $controller = new Cm_Diehard_LoadController($request, $response);
