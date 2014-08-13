@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2011 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2014 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -44,14 +44,19 @@ class Mage_Core_Controller_Response_Http extends Zend_Controller_Response_Http
      *
      * @link  http://bugs.php.net/bug.php?id=36705
      *
+     * @return Mage_Core_Controller_Response_Http
      */
     public function sendHeaders()
     {
-        if (!$this->canSendHeaders()) {
-            /* START: Added by Cm_Diehard */
-            headers_sent($file, $line);
-            Mage::log("HEADERS ALREADY SENT: $file:$line");
-            /* END: Added by Cm_Diehard */
+        // Only check if we can send headers if we have headers to send
+        if (count($this->_headersRaw) || count($this->_headers) || (200 != $this->_httpResponseCode)) {
+            if ( ! $this->canSendHeaders()) {
+                headers_sent($file, $line);
+                Mage::log("HEADERS ALREADY SENT: $file:$line");
+                return $this;
+            }
+        } elseif (200 == $this->_httpResponseCode) {
+            // Haven't changed the response code, and we have no headers
             return $this;
         }
 
@@ -76,13 +81,14 @@ class Mage_Core_Controller_Response_Http extends Zend_Controller_Response_Http
                 }
             }
         }
-        parent::sendHeaders();
+
+        return parent::sendHeaders();
     }
 
     public function sendResponse()
     {
         Mage::dispatchEvent('http_response_send_before', array('response'=>$this));
-        return parent::sendResponse();
+        parent::sendResponse();
     }
 
     /**
@@ -106,5 +112,14 @@ class Mage_Core_Controller_Response_Http extends Zend_Controller_Response_Http
                 array('response' => $this, 'transport' => self::$_transportObject));
 
         return parent::setRedirect(self::$_transportObject->getUrl(), self::$_transportObject->getCode());
+    }
+
+    /**
+     * Method send already collected headers and exit from script
+     */
+    public function sendHeadersAndExit()
+    {
+        $this->sendHeaders();
+        exit;
     }
 }
