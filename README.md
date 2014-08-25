@@ -17,7 +17,9 @@ There are currently three backends and three hole-punching (injection) methods. 
 all injection methods. The backend and supported injection methods are:
 
 - Local Backend
- - Javascript (served inline with the response)
+ - Javascript (supports "Early Flush", similar to Facebook's "BigPipe" method)
+ - Ajax
+ - ESI
 - Proxy Backend
  - Ajax
  - ESI
