@@ -165,6 +165,9 @@
             <ignored_tags>
                 <block_html/>
             </ignored_tags>
+            <ignored_tag_patterns>
+                <!-- Example: <tag>^CATEGORY_\d+</tag> -->
+            </ignored_tag_patterns>
 
         </diehard>
     </frontend>

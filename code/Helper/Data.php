@@ -128,12 +128,28 @@ class Cm_Diehard_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $tags = array_unique($this->_tags);
         if ($tags) {
+            // Filter tags by exact match
             $path = Mage::app()->getLayout()->getArea().'/diehard/ignored_tags';
             $ignoredTags = array_keys(
                 Mage::app()->getConfig()->getNode($path)->asCanonicalArray()
             );
             $tags = array_diff($tags, $ignoredTags);
+
+            // Filter tags by pattern
+            $path = Mage::app()->getLayout()->getArea().'/diehard/ignored_tag_patterns';
+            $node = Mage::app()->getConfig()->getNode($path);
+            if ($node->hasChildren()) {
+                foreach ($node->children() as $pattern) {
+                    $tags = array_diff($tags, preg_grep("$pattern", $tags));
+                }
+            }
         }
+
+        // Allow event observers to modify tags
+        $transport = new Varien_Object(['tags' => $tags]);
+        Mage::dispatchEvent('diehard_get_tags', ['transport' => $transport]);
+        $tags = $transport->getData('tags');
+
         return $tags;
     }
 
