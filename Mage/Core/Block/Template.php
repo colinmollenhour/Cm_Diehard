@@ -246,7 +246,7 @@ HTML;
 
         try {
             $includeFilePath = realpath($this->_viewDir . DS . $fileName);
-            if (strpos($includeFilePath, realpath($this->_viewDir)) === 0 || $this->_getAllowSymlinks()) {
+            if (file_exists($includeFilePath) && (strpos($includeFilePath, realpath($this->_viewDir)) === 0 || $this->_getAllowSymlinks())) {
                 include $includeFilePath;
             } else {
                 Mage::log('Not valid template file:'.$fileName, Zend_Log::CRIT, null, null, true);
