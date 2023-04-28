@@ -350,7 +350,7 @@ HTML;
         return array(
             'BLOCK_TPL',
             Mage::app()->getStore()->getCode(),
-            $this->getTemplateFile(),
+            $this->getTemplate() ? $this->getTemplateFile() : '',
             'template' => $this->getTemplate()
         );
     }
