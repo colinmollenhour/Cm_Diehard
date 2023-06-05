@@ -188,6 +188,13 @@ class Cm_Diehard_Model_Backend_Local extends Cm_Diehard_Model_Backend_Abstract
                         if (($params['blocks'] || ! empty($params['all_blocks']))
                           && (int) Mage::app()->getConfig()->getNode(self::XML_PATH_EARLY_FLUSH)
                         ) {
+                            // Disable buffering of the response so early flush can reach the client
+                            // (supported by nginx to disable proxy_buffering and fastcgi_buffering)
+                            Mage::app()->getResponse()->setHeader('X-Accel-Buffering', 'no');
+                            
+                            // Disable zlib compression since it will not allow early flush
+                            ini_set('zlib.output_compression', 'Off');
+                            
                             $_body = $this->replaceParamsInBody($body, '');
                             list($first,$last) = explode('</body>', $_body, 2);
 
