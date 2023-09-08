@@ -414,11 +414,9 @@ from the ignored blocks list.
 ## Hit Rate Monitor
 
 Redis can be used for monitoring the hit-rate of the cache on the Revalidate backend and the Local backend.
-To enable this feature you must have Credis_Client present in your lib directory:
+To enable this feature you must have [Credis_Client](https://packagist.org/packages/colinmollenhour/credis) installed.
 
-    git clone git://github.com/colinmollenhour/credis.git lib/Credis
-
-Then setup your configuration in app/etc/local.xml:
+Then set up your configuration in `app/etc/local.xml`:
 
 ```xml
 <!-- CONFIG -->
@@ -436,7 +434,16 @@ Then setup your configuration in app/etc/local.xml:
 ```
 
 The above configuration example enables hit and miss counters to be updated on every request to the
-specified Redis server. Use the included munin script to monitor these values with munin. (TODO)
+specified Redis server. Monitoring these stats is currently left as an exercise for you, but the keys can easily be queried:
+
+```
+redis-cli get diehard:hit
+redis-cli get diehard:miss
+redis-cli get diehard:catalog_product_view:hit
+etc...
+```
+
+Check `diehard_counter.log` for errors if stats are not being logged.
 
 ## Offloader header
 
