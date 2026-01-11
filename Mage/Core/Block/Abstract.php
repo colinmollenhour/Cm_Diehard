@@ -489,7 +489,7 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
             unset($this->_children[$alias]);
             $key = array_search($name, $this->_sortedChildren);
             if ($key !== false) {
-                unset($this->_sortedChildren[$key]);
+                array_splice($this->_sortedChildren, $key, 1);
             }
         }
 
@@ -557,10 +557,9 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
     {
         if ($name === '') {
             return $this->_children;
-        } elseif (isset($this->_children[$name])) {
-            return $this->_children[$name];
         }
-        return false;
+
+        return $this->_children[$name] ?? false;
     }
 
     /**
@@ -712,6 +711,11 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
             $this->setChild($name, $block);
         }
 
+        $existingKey = array_search($name, $this->_sortedChildren);
+        if ($existingKey !== false) {
+            array_splice($this->_sortedChildren, $existingKey, 1);
+        }
+
         if ($siblingName === '') {
             if ($after) {
                 $this->_sortedChildren[] = $name;
@@ -747,7 +751,6 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
      */
     public function sortChildren($force = false)
     {
-        $this->_sortedChildren = array_values($this->_sortedChildren); // reset indexes which might have gaps after unsetting blocks
         foreach ($this->_sortInstructions as $name => $list) {
             list($siblingName, $after, $exists) = $list;
             if ($exists && !$force) {
@@ -1143,6 +1146,22 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
     }
 
     /**
+     * Retrieve formatting timezone date
+     *
+     * @param null|int|string|Zend_Date $date
+     */
+    public function formatTimezoneDate(
+        $date = null,
+        string $format = Mage_Core_Model_Locale::FORMAT_TYPE_SHORT,
+        bool $showTime = false,
+        bool $useTimezone = true
+    ): string {
+        /** @var Mage_Core_Helper_Data $helper */
+        $helper = $this->helper('core');
+        return $helper->formatTimezoneDate($date, $format, $showTime, $useTimezone);
+    }
+
+    /**
      * Retrieve formatting time
      *
      * @param   string $time
@@ -1208,6 +1227,37 @@ abstract class Mage_Core_Block_Abstract extends Varien_Object
     public function escapeHtml($data, $allowedTags = null)
     {
         return $this->helper('core')->escapeHtml($data, $allowedTags);
+    }
+
+    /**
+     * Wrapper for escapeHtml() function with keeping original value
+     *
+     * @param null|array $allowedTags
+     *
+     * @see Mage_Core_Model_Security_HtmlEscapedString::getUnescapedValue()
+     */
+    public function escapeHtmlAsObject(string $data, ?array $allowedTags = null): Mage_Core_Model_Security_HtmlEscapedString
+    {
+        return new Mage_Core_Model_Security_HtmlEscapedString($data, $allowedTags);
+    }
+
+    /**
+     * Wrapper for escapeHtml() function with keeping original value
+     *
+     * @param  array                                        $data
+     * @param  null|array                                   $allowedTags
+     * @return Mage_Core_Model_Security_HtmlEscapedString[]
+     *
+     *  @see Mage_Core_Model_Security_HtmlEscapedString::getUnescapedValue()
+     */
+    public function escapeHtmlArrayAsObject(array $data, ?array $allowedTags = null): array
+    {
+        $result = [];
+        foreach ($data as $key => $string) {
+            $result[$key] = $this->escapeHtmlAsObject($string, $allowedTags);
+        }
+
+        return $result;
     }
 
     /**
